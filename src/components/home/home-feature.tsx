@@ -53,24 +53,24 @@ export default function HomeFeature() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-300">
-      {/* Hero Section */}
+      {/* Hero Section - Updated with full width and better spacing */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 2 }}
-        className="hero min-h-screen relative overflow-hidden"
+        className="w-full min-h-screen relative overflow-hidden flex items-center justify-center px-4"
       >
-        <div className="hero-content text-center z-10">
-          <div className="max-w-3xl">
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="text-center">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.5, type: "spring" }}
             >
-              <Heart className="w-24 h-24 mx-auto text-pink-500 mb-8" />
+              <Heart className="w-32 h-32 mx-auto text-pink-500 mb-12" />
             </motion.div>
             <motion.h1 
-              className="text-6xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-500"
+              className="text-7xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-500"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 1 }}
@@ -78,7 +78,7 @@ export default function HomeFeature() {
               Love at First Trade
             </motion.h1>
             <motion.p 
-              className="text-xl mb-8"
+              className="text-2xl mb-12 max-w-2xl mx-auto"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 1.5 }}
@@ -89,15 +89,16 @@ export default function HomeFeature() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 2 }}
+              className="space-x-4"
             >
               {!publicKey ? (
                 <WalletButton />
               ) : !isAuthenticated ? (
-                <Button onClick={handleSignMessage} className="bg-pink-500 hover:bg-pink-600">
+                <Button onClick={handleSignMessage} className="bg-pink-500 hover:bg-pink-600 text-lg px-8 py-6">
                   Sign Message to Begin Your Journey
                 </Button>
               ) : (
-                <Button href="/dashboard" className="bg-purple-500 hover:bg-purple-600">
+                <Button href="/dashboard" className="bg-purple-500 hover:bg-purple-600 text-lg px-8 py-6">
                   Enter Your Trading Paradise
                 </Button>
               )}
@@ -105,33 +106,34 @@ export default function HomeFeature() {
           </div>
         </div>
         
-        {/* Floating hearts background */}
         <FloatingHearts />
       </motion.div>
 
-      {/* Scrolling Story Sections */}
-      <div className="py-20">
-        {sections.map((section, index) => (
-          <ScrollSection
-            key={index}
-            index={index}
-            title={section.title}
-            content={section.content}
-            icon={section.icon}
-          />
-        ))}
+      {/* Story Sections - Updated with better spacing and full width */}
+      <div className="w-full py-32 px-4">
+        <div className="max-w-7xl mx-auto">
+          {sections.map((section, index) => (
+            <ScrollSection
+              key={index}
+              index={index}
+              title={section.title}
+              content={section.content}
+              icon={section.icon}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Final CTA Section */}
+      {/* Final CTA Section - Updated with full width */}
       {isAuthenticated && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="py-20 px-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10"
+          className="w-full py-32 px-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10"
         >
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-8">Your Trading Fairytale Begins</h2>
-            <Button href="/dashboard" size="lg" className="bg-pink-500 hover:bg-pink-600">
+          <div className="max-w-7xl mx-auto text-center">
+            <h2 className="text-5xl font-bold mb-8">Your Trading Fairytale Begins</h2>
+            <Button href="/dashboard" size="lg" className="bg-pink-500 hover:bg-pink-600 text-lg px-8 py-6">
               Start Your Journey
             </Button>
           </div>
@@ -153,18 +155,18 @@ function ScrollSection({ title, content, icon, index }: {
   return (
     <motion.div
       ref={ref}
-      className={`max-w-4xl mx-auto p-8 mb-20 ${index % 2 === 0 ? 'text-left' : 'text-right'}`}
+      className={`w-full mb-40 ${index % 2 === 0 ? 'text-left' : 'text-right'}`}
       initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100 }}
       animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: index % 2 === 0 ? -100 : 100 }}
       transition={{ duration: 0.8, delay: 0.2 }}
     >
-      <div className={`flex items-center gap-6 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
+      <div className={`flex items-center gap-12 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
         <div className="flex-shrink-0">
-          {icon}
+          {React.cloneElement(icon as React.ReactElement, { className: 'w-20 h-20' })}
         </div>
         <div>
-          <h2 className="text-3xl font-bold mb-4">{title}</h2>
-          <p className="text-lg opacity-80">{content}</p>
+          <h2 className="text-4xl font-bold mb-6">{title}</h2>
+          <p className="text-xl opacity-80">{content}</p>
         </div>
       </div>
     </motion.div>
@@ -174,13 +176,13 @@ function ScrollSection({ title, content, icon, index }: {
 function FloatingHearts() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
+      {[...Array(30)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute"
           initial={{
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
+            x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+            y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
             scale: 0,
           }}
           animate={{
@@ -193,7 +195,7 @@ function FloatingHearts() {
             delay: Math.random() * 5,
           }}
         >
-          <Heart className="w-4 h-4 text-pink-500 opacity-30" />
+          <Heart className={`w-${Math.floor(Math.random() * 3) + 4} h-${Math.floor(Math.random() * 3) + 4} text-pink-500 opacity-${Math.floor(Math.random() * 3) + 2}0`} />
         </motion.div>
       ))}
     </div>
