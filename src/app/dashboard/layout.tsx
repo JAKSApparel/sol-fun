@@ -1,4 +1,5 @@
 import { SolCrusherSidebar } from "@/components/dashboard/solcrusher-sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
 
 export default function DashboardLayout({
   children,
@@ -6,13 +7,15 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex h-screen overflow-hidden">
-      <SolCrusherSidebar className="hidden md:flex" />
-      <main className="flex-1 overflow-y-auto bg-[#13111C]">
-        <div className="container mx-auto p-6">
-          {children}
-        </div>
-      </main>
-    </div>
+    <SidebarProvider>
+      <div className="flex h-screen overflow-hidden">
+        <SolCrusherSidebar className="hidden md:flex" />
+        <main className="flex-1 overflow-y-auto bg-[#13111C]">
+          <div className="container mx-auto p-6">
+            {children}
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   )
 } 
