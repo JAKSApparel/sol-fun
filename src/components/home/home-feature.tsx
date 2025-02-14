@@ -1,218 +1,202 @@
 'use client'
 
 import React from 'react'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { useState, useRef, useEffect } from 'react'
-import { WalletButton } from '../solana/solana-provider'
+import { motion } from 'framer-motion'
+import Image from 'next/image'
+import { Zap, Shield, BarChart3 } from 'lucide-react'
 import { Button } from '../ui/button'
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { Heart, Sparkles, Lock, Key, Rocket } from 'lucide-react'
-import { NetworkSelector } from '../solana/network-selector'
-import { AirdropButton } from '../solana/airdrop-button'
-import { useCluster } from '../cluster/cluster-data-access'
-import { ClusterNetwork } from '../cluster/cluster-data-access'
+import { TradingInterface } from '../trading-interface'
 
 export default function HomeFeature() {
-  const { publicKey, signMessage } = useWallet()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const { cluster } = useCluster()
-  
-  const handleSignMessage = async () => {
-    try {
-      if (!signMessage) throw new Error('Wallet does not support message signing')
-      const message = new TextEncoder().encode('Welcome to SolCrusher! Sign this message to verify your wallet.')
-      await signMessage(message)
-      setIsAuthenticated(true)
-    } catch (error) {
-      console.error('Error signing message:', error)
-    }
-  }
-
-  // Story sections with refs for scroll animations
-  const sections = [
-    {
-      title: "Once upon a time...",
-      content: "In the vast universe of blockchain, traders searched endlessly for their perfect match.",
-      icon: <Heart className="w-full h-full text-pink-500" />,
-    },
-    {
-      title: "Then came a spark...",
-      content: "SolCrusher emerged, bringing AI-powered intelligence to the Solana ecosystem.",
-      icon: <Sparkles className="w-full h-full text-yellow-500" />,
-    },
-    {
-      title: "A promise of protection...",
-      content: "No more heartbreaks from rug pulls. We keep your investments safe and sound.",
-      icon: <Lock className="w-full h-full text-purple-500" />,
-    },
-    {
-      title: "The perfect match...",
-      content: "Advanced analytics meet user-friendly design, creating harmony in trading.",
-      icon: <Key className="w-full h-full text-blue-500" />,
-    },
-    {
-      title: "To the moon together...",
-      content: "Join us on this journey to revolutionize Solana trading forever.",
-      icon: <Rocket className="w-full h-full text-red-500" />,
-    },
-  ]
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-300">
-      <div className="absolute top-4 right-4 z-50">
-        <NetworkSelector />
-      </div>
-
-      {cluster.network === ClusterNetwork.Devnet && (
-        <div className="absolute top-4 right-40 z-50">
-          <AirdropButton />
-        </div>
-      )}
-
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 2 }}
-        className="w-full min-h-screen relative overflow-hidden flex items-center justify-center px-4"
-      >
-        <div className="w-full max-w-7xl mx-auto">
-          <div className="text-center">
+    <div className="min-h-screen bg-[#13111C] text-white">
+      {/* Hero Section with Trading Interface */}
+      <section className="pt-32 pb-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.5, type: "spring" }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="lg:sticky lg:top-24"
             >
-              <Heart className="w-32 h-32 mx-auto text-pink-500 mb-12" />
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#14F195]/10 rounded-full border border-[#14F195]/20">
+                  <Image 
+                    src="/sol.svg"
+                    alt="Solana Logo"
+                    width={16}
+                    height={16}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-[#14F195]">Powered by Solana</span>
+                </div>
+                <h1 className="text-5xl font-bold space-y-2">
+                  <span className="block">Trade Smarter.</span>
+                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#9945FF] to-[#14F195]">
+                    Trade Safer.
+                  </span>
+                </h1>
+                <p className="text-lg text-gray-400">
+                  Advanced trading tools and real-time analytics for serious Solana traders.
+                  Built for speed, security, and precision.
+                </p>
+                <div className="flex gap-4">
+                  <Button className="bg-[#14F195] hover:bg-[#14F195]/90 text-black">
+                    Launch App
+                  </Button>
+                  <Button variant="outline" className="border-[#334155] text-white hover:bg-[#1E293B]">
+                    Documentation
+                  </Button>
+                </div>
+              </div>
             </motion.div>
-            <motion.h1 
-              className="text-7xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-500"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1 }}
-            >
-              Love at First Trade
-            </motion.h1>
-            <motion.p 
-              className="text-2xl mb-12 max-w-2xl mx-auto"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.5 }}
-            >
-              This Valentine's Day, fall in love with trading all over again
-            </motion.p>
+
+            {/* Trading Interface */}
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 2 }}
-              className="space-x-4"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="relative lg:sticky lg:top-24"
             >
-              {!publicKey ? (
-                <WalletButton />
-              ) : !isAuthenticated ? (
-                <Button onClick={handleSignMessage} className="bg-pink-500 hover:bg-pink-600 text-lg px-8 py-6">
-                  Sign Message to Begin Your Journey
-                </Button>
-              ) : (
-                <Button href="/dashboard" className="bg-purple-500 hover:bg-purple-600 text-lg px-8 py-6">
-                  Enter Your Trading Paradise
-                </Button>
-              )}
+              <TradingInterface />
             </motion.div>
           </div>
         </div>
-        
-        <FloatingHearts />
-      </motion.div>
+      </section>
 
-      <div className="w-full py-32 px-4">
-        <div className="max-w-7xl mx-auto">
-          {sections.map((section, index) => (
-            <ScrollSection
-              key={index}
-              index={index}
-              title={section.title}
-              content={section.content}
-              icon={section.icon}
-            />
-          ))}
-        </div>
-      </div>
-
-      {isAuthenticated && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="w-full py-32 px-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10"
-        >
-          <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-5xl font-bold mb-8">Your Trading Fairytale Begins</h2>
-            <Button href="/dashboard" size="lg" className="bg-pink-500 hover:bg-pink-600 text-lg px-8 py-6">
-              Start Your Journey
-            </Button>
-          </div>
-        </motion.div>
-      )}
-    </div>
-  )
-}
-
-function ScrollSection({ title, content, icon, index }: {
-  title: string
-  content: string
-  icon: React.ReactNode
-  index: number
-}) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
-
-  return (
-    <motion.div
-      ref={ref}
-      className={`w-full mb-40 ${index % 2 === 0 ? 'text-left' : 'text-right'}`}
-      initial={{ opacity: 0, x: index % 2 === 0 ? -100 : 100 }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: index % 2 === 0 ? -100 : 100 }}
-      transition={{ duration: 0.8, delay: 0.2 }}
-    >
-      <div className={`flex items-center gap-12 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-        <div className="flex-shrink-0">
-          <div className="w-20 h-20">
-            {icon}
+      {/* Key Features Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-12 text-center">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9945FF] to-[#14F195]">
+              Key Features
+            </span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "AI-Powered Market Intelligence",
+                description: "Advanced AI models analyze market trends, social sentiment, and historical data.",
+                icon: <BarChart3 className="w-6 h-6 text-[#9945FF]" />
+              },
+              {
+                title: "Automated Trading Strategies",
+                description: "Smart bots for automated market-making, sniping, and liquidity provision.",
+                icon: <Zap className="w-6 h-6 text-[#9945FF]" />
+              },
+              {
+                title: "Rug Protection & Risk Management",
+                description: "On-chain detection tools to flag suspicious projects before investing.",
+                icon: <Shield className="w-6 h-6 text-[#9945FF]" />
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.2 }}
+                className="group relative bg-[#1E1B2E] rounded-lg p-6 border border-purple-500/20 hover:border-purple-500/50 transition-all overflow-hidden"
+              >
+                {/* Gradient background that shows on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                
+                <div className="relative z-10">
+                  <div className="mb-4">{feature.icon}</div>
+                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                  <p className="text-gray-400">{feature.description}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-        <div>
-          <h2 className="text-4xl font-bold mb-6">{title}</h2>
-          <p className="text-xl opacity-80">{content}</p>
-        </div>
-      </div>
-    </motion.div>
-  )
-}
+      </section>
 
-function FloatingHearts() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(30)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute"
-          initial={{
-            x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-            y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-            scale: 0,
-          }}
-          animate={{
-            y: [null, -1000],
-            scale: [0, 1, 0],
-          }}
-          transition={{
-            duration: 10 + Math.random() * 10,
-            repeat: Infinity,
-            delay: Math.random() * 5,
-          }}
-        >
-          <Heart className={`w-${Math.floor(Math.random() * 3) + 4} h-${Math.floor(Math.random() * 3) + 4} text-pink-500 opacity-${Math.floor(Math.random() * 3) + 2}0`} />
-        </motion.div>
-      ))}
+      {/* Tokenomics Section */}
+      <section className="py-20 bg-[#1E1B2E]/50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-12 text-center">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9945FF] to-[#14F195]">
+              Tokenomics
+            </span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            {[
+              { label: "Community Rewards & Staking", value: "40%" },
+              { label: "Liquidity & Exchange", value: "20%" },
+              { label: "Development & Treasury", value: "20%" },
+              { label: "Team & Advisors", value: "10%" },
+              { label: "Marketing & Partnerships", value: "10%" },
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="group relative bg-[#1E1B2E] rounded-lg p-6 border border-purple-500/20 hover:border-purple-500/50 transition-all overflow-hidden text-center"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="text-2xl font-bold text-[#9945FF] mb-2">{item.value}</div>
+                  <div className="text-sm text-gray-400">{item.label}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Roadmap Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-12 text-center">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9945FF] to-[#14F195]">
+              Roadmap
+            </span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                phase: "Phase 1: MVP Development",
+                date: "Q2 2025",
+                items: ["AI trading bot integration", "Basic analytics dashboard", "NFT & token tracking module"]
+              },
+              {
+                phase: "Phase 2: Feature Expansion",
+                date: "Q3 2025",
+                items: ["Advanced AI models", "Mobile app release", "Partnerships with Solana DeFi projects"]
+              },
+              {
+                phase: "Phase 3: Full Platform Rollout",
+                date: "Q4 2025",
+                items: ["Governance model", "Social sentiment analysis", "Staking and token rewards"]
+              }
+            ].map((phase, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.2 }}
+                className="group relative bg-[#1E1B2E] rounded-lg p-6 border border-purple-500/20 hover:border-purple-500/50 transition-all overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="text-[#9945FF] font-bold mb-1">{phase.date}</div>
+                  <h3 className="text-xl font-bold mb-4">{phase.phase}</h3>
+                  <ul className="space-y-2">
+                    {phase.items.map((item, i) => (
+                      <li key={i} className="text-gray-400 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#9945FF]" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   )
 } 
