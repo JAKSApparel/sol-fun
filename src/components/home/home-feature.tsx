@@ -49,7 +49,7 @@ function TokenomicsSection() {
           <div className="space-y-6">
             <h3 className="text-2xl font-bold">The Future of Trading</h3>
             <p className="text-gray-400 leading-relaxed">
-              $CRUSH is not just another token - it's the backbone of our ecosystem, 
+              $CRUSH is not just another token - it&apos;s the backbone of our ecosystem, 
               powering advanced trading features, governance, and rewards for our community.
             </p>
             <div className="space-y-4">
