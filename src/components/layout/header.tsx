@@ -9,9 +9,19 @@ import { AirdropButton } from '../solana/airdrop-button'
 import { useCluster } from '../cluster/cluster-data-access'
 import { ClusterNetwork } from '../cluster/cluster-data-access'
 import Image from 'next/image'
-import { Search } from 'lucide-react'
+import { Search, ChevronDown, User, Settings, LogOut } from 'lucide-react'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ellipsify } from '../ui/ui-layout'
 
 export function Header() {
   const { connection } = useConnection()
@@ -72,20 +82,54 @@ export function Header() {
               />
               <Search className="absolute right-3 top-2.5 w-4 h-4 text-gray-500" />
             </div>
-            {publicKey && balance !== null && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-[#1E293B] rounded-full border border-[#334155]">
-                <Image 
-                  src="/sol.svg"
-                  alt="SOL"
-                  width={16}
-                  height={16}
-                  className="w-4 h-4"
-                />
-                <span className="text-sm font-medium">
-                  {balance.toFixed(2)} SOL
-                </span>
-              </div>
-            )}
+            {publicKey && balance !== null ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2 px-4 py-2 bg-[#1E293B] rounded-full border border-[#334155] hover:bg-[#1E293B]/80">
+                    <Image 
+                      src="/sol.svg"
+                      alt="SOL"
+                      width={16}
+                      height={16}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm font-medium">
+                      {balance.toFixed(2)} SOL
+                    </span>
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 bg-[#1E1B2E] border border-purple-500/20 text-white">
+                  <DropdownMenuLabel>
+                    <div className="text-xs text-gray-400">Connected as</div>
+                    <div className="font-mono text-sm">{ellipsify(publicKey.toString())}</div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-purple-500/20" />
+                  <Link href="/account">
+                    <DropdownMenuItem className="cursor-pointer hover:bg-purple-500/10">
+                      <User className="w-4 h-4 mr-2" />
+                      Account
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/dashboard">
+                    <DropdownMenuItem className="cursor-pointer hover:bg-purple-500/10">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator className="bg-purple-500/20" />
+                  <DropdownMenuItem 
+                    className="cursor-pointer text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                    onClick={() => {
+                      // Add wallet disconnect logic here if needed
+                    }}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Disconnect
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null}
             {cluster.network === ClusterNetwork.Devnet && <AirdropButton />}
             <NetworkSelector />
             {!publicKey ? (

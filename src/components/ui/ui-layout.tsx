@@ -5,44 +5,12 @@ import {usePathname} from 'next/navigation'
 import * as React from 'react'
 import {ReactNode, Suspense, useEffect, useRef} from 'react'
 import toast, {Toaster} from 'react-hot-toast'
+import {ExplorerLink} from '../cluster/cluster-ui'
 
-import {AccountChecker} from '../account/account-ui'
-import {ClusterChecker, ClusterUiSelect, ExplorerLink} from '../cluster/cluster-ui'
-import {WalletButton} from '../solana/solana-provider'
-
-const defaultLinks = [
-  { label: 'Account', path: '/account' },
-  { label: 'Clusters', path: '/clusters' },
-  { label: 'Dashboard', path: '/dashboard' },
-]
-
-type Props = {
-  children: React.ReactNode
-  links?: { label: string; path: string }[]
-}
-
-export function UiLayout({ children, links = defaultLinks }: Props) {
-  const pathname = usePathname()
-
+export function UiLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background font-sans antialiased">
-      <div className="navbar bg-base-100">
-        <div className="flex-1">
-          <Link href="/" className="btn btn-ghost normal-case text-xl">
-            SolCrusher
-          </Link>
-          <ul className="menu menu-horizontal px-1 space-x-2">
-            {links.map(({ label, path }) => (
-              <li key={path}>
-                <Link className={pathname.startsWith(path) ? 'active' : ''} href={path}>
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <main>{children}</main>
+      {children}
     </div>
   )
 }
