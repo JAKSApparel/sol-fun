@@ -65,8 +65,8 @@ export function Header() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-2">
             <Image 
-              src="/sol.svg"
-              alt="Solana Logo"
+              src="/logo.png"
+              alt="SolCrusher Logo"
               width={32}
               height={32}
               className="w-8 h-8"
