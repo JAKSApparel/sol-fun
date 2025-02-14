@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useState, useRef, useEffect } from 'react'
 import { WalletButton } from '../solana/solana-provider'
@@ -27,27 +28,27 @@ export default function HomeFeature() {
     {
       title: "Once upon a time...",
       content: "In the vast universe of blockchain, traders searched endlessly for their perfect match.",
-      icon: <Heart className="w-12 h-12 text-pink-500" />,
+      icon: <Heart className="w-full h-full text-pink-500" />,
     },
     {
       title: "Then came a spark...",
       content: "SolCrusher emerged, bringing AI-powered intelligence to the Solana ecosystem.",
-      icon: <Sparkles className="w-12 h-12 text-yellow-500" />,
+      icon: <Sparkles className="w-full h-full text-yellow-500" />,
     },
     {
       title: "A promise of protection...",
       content: "No more heartbreaks from rug pulls. We keep your investments safe and sound.",
-      icon: <Lock className="w-12 h-12 text-purple-500" />,
+      icon: <Lock className="w-full h-full text-purple-500" />,
     },
     {
       title: "The perfect match...",
       content: "Advanced analytics meet user-friendly design, creating harmony in trading.",
-      icon: <Key className="w-12 h-12 text-blue-500" />,
+      icon: <Key className="w-full h-full text-blue-500" />,
     },
     {
       title: "To the moon together...",
       content: "Join us on this journey to revolutionize Solana trading forever.",
-      icon: <Rocket className="w-12 h-12 text-red-500" />,
+      icon: <Rocket className="w-full h-full text-red-500" />,
     },
   ]
 
@@ -162,7 +163,9 @@ function ScrollSection({ title, content, icon, index }: {
     >
       <div className={`flex items-center gap-12 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
         <div className="flex-shrink-0">
-          {React.cloneElement(icon as React.ReactElement, { className: 'w-20 h-20' })}
+          <div className="w-20 h-20">
+            {icon}
+          </div>
         </div>
         <div>
           <h2 className="text-4xl font-bold mb-6">{title}</h2>
