@@ -7,10 +7,15 @@ import { WalletButton } from '../solana/solana-provider'
 import { Button } from '../ui/button'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { Heart, Sparkles, Lock, Key, Rocket } from 'lucide-react'
+import { NetworkSelector } from '../solana/network-selector'
+import { AirdropButton } from '../solana/airdrop-button'
+import { useCluster } from '../cluster/cluster-data-access'
+import { ClusterNetwork } from '../cluster/cluster-data-access'
 
 export default function HomeFeature() {
   const { publicKey, signMessage } = useWallet()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { cluster } = useCluster()
   
   const handleSignMessage = async () => {
     try {
@@ -54,7 +59,16 @@ export default function HomeFeature() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-300">
-      {/* Hero Section - Updated with full width and better spacing */}
+      <div className="absolute top-4 right-4 z-50">
+        <NetworkSelector />
+      </div>
+
+      {cluster.network === ClusterNetwork.Devnet && (
+        <div className="absolute top-4 right-40 z-50">
+          <AirdropButton />
+        </div>
+      )}
+
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -110,7 +124,6 @@ export default function HomeFeature() {
         <FloatingHearts />
       </motion.div>
 
-      {/* Story Sections - Updated with better spacing and full width */}
       <div className="w-full py-32 px-4">
         <div className="max-w-7xl mx-auto">
           {sections.map((section, index) => (
@@ -125,7 +138,6 @@ export default function HomeFeature() {
         </div>
       </div>
 
-      {/* Final CTA Section - Updated with full width */}
       {isAuthenticated && (
         <motion.div
           initial={{ opacity: 0 }}

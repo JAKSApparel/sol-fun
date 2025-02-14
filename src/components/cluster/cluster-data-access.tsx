@@ -28,13 +28,18 @@ export const defaultClusters: Cluster[] = [
     network: ClusterNetwork.Devnet,
   },
   {
-    name: 'Localhost',
-    endpoint: 'http://localhost:8899',
+    name: 'Mainnet',
+    endpoint: 'https://api.mainnet-beta.solana.com',
+    network: ClusterNetwork.Mainnet,
   },
   {
     name: 'Testnet',
     endpoint: clusterApiUrl('testnet'),
     network: ClusterNetwork.Testnet,
+  },
+  {
+    name: 'Localhost',
+    endpoint: 'http://localhost:8899',
   },
 ]
 
