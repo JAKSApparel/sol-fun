@@ -9,10 +9,17 @@ import { AirdropButton } from '../solana/airdrop-button'
 import { useCluster } from '../cluster/cluster-data-access'
 import { ClusterNetwork } from '../cluster/cluster-data-access'
 import Image from 'next/image'
-import { Search, ChevronDown, User, Settings, LogOut } from 'lucide-react'
+import { Search, ChevronDown, User, Settings, LogOut, Menu, X } from 'lucide-react'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +36,7 @@ export function Header() {
   const [balance, setBalance] = useState<number | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const { cluster } = useCluster()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     async function getBalance() {
@@ -73,7 +81,7 @@ export function Header() {
             />
             <span className="text-xl font-bold">SolCrusher</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
             <div className="relative">
               <input 
                 type="text" 
@@ -140,6 +148,74 @@ export function Header() {
               </Button>
             ) : null}
           </div>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] bg-[#1E1B2E] border-l border-purple-500/20 p-0">
+              <div className="flex flex-col h-full">
+                <div className="p-4 border-b border-purple-500/20">
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      placeholder="Search tokens or paste address"
+                      className="w-full bg-[#0F172A] border border-[#334155] rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#14F195]"
+                    />
+                    <Search className="absolute right-3 top-2.5 w-4 h-4 text-gray-500" />
+                  </div>
+                </div>
+                <div className="p-4 space-y-4">
+                  {publicKey && (
+                    <div className="mb-4 p-3 bg-[#1E293B] rounded-lg">
+                      <div className="text-xs text-gray-400">Connected as</div>
+                      <div className="font-mono text-sm">{ellipsify(publicKey.toString())}</div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <Image 
+                          src="/sol.svg"
+                          alt="SOL"
+                          width={16}
+                          height={16}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-sm font-medium">
+                          {balance?.toFixed(2)} SOL
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-2">
+                    <Link href="/account">
+                      <Button variant="ghost" className="w-full justify-start">
+                        <User className="w-4 h-4 mr-2" />
+                        Account
+                      </Button>
+                    </Link>
+                    <Link href="/dashboard">
+                      <Button variant="ghost" className="w-full justify-start">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Dashboard
+                      </Button>
+                    </Link>
+                  </div>
+
+                  <div className="space-y-2">
+                    {cluster.network === ClusterNetwork.Devnet && <AirdropButton className="w-full" />}
+                    <NetworkSelector />
+                    {!publicKey ? (
+                      <WalletButton />
+                    ) : !isAuthenticated ? (
+                      <Button onClick={handleSignMessage} className="w-full bg-[#14F195] hover:bg-[#14F195]/90 text-black">
+                        Verify Wallet
+                      </Button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>
