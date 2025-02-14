@@ -1,12 +1,13 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { Zap, Shield, BarChart3, Copy } from 'lucide-react'
+import { Zap, Shield, BarChart3, Copy, Construction, X } from 'lucide-react'
 import { Button } from '../ui/button'
 import { TradingInterface } from '../trading-interface'
 import { toast } from 'react-hot-toast'
+import Link from 'next/link'
 
 // Add this component for the blurred token address
 function ComingSoonToken() {
@@ -121,11 +122,63 @@ function TokenomicsSection() {
   )
 }
 
+// Add this component
+function DevelopmentNotice() {
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    // Check if user has already acknowledged
+    const hasAcknowledged = localStorage.getItem('developmentNoticeAcknowledged')
+    if (!hasAcknowledged) {
+      setIsVisible(true)
+    }
+  }, [])
+
+  const handleAcknowledge = () => {
+    localStorage.setItem('developmentNoticeAcknowledged', 'true')
+    setIsVisible(false)
+  }
+
+  if (!isVisible) return null
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#1E1B2E] border-t border-purple-500/20 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Construction className="w-5 h-5 text-[#9945FF] animate-pulse" />
+            <div className="text-sm">
+              <span className="font-semibold text-[#9945FF]">Development in Progress:</span>
+              {" "}We&apos;re building in public! Join our community to be part of the journey and shape the future of SolCrusher.
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link 
+              href="https://t.me/solcrusher" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm text-[#9945FF] hover:text-[#9945FF]/80 transition-colors"
+            >
+              Join Community
+            </Link>
+            <Button
+              onClick={handleAcknowledge}
+              className="bg-[#9945FF] hover:bg-[#9945FF]/90 text-white"
+            >
+              I Understand
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function HomeFeature() {
   return (
     <div className="min-h-screen bg-[#13111C] text-white">
       {/* Hero Section with Trading Interface */}
-      <section className="pt-32 pb-20">
+      <section className="pt-24 pb-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             <motion.div
@@ -228,6 +281,58 @@ export default function HomeFeature() {
 
       <TokenomicsSection />
 
+      {/* Add this section before the Key Features */}
+      <section className="py-20 bg-[#1E1B2E]/50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="rounded-lg border border-[#9945FF]/20 p-8 bg-[#1E1B2E]">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9945FF] to-[#14F195]">
+                Building Together
+              </span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "Open Development",
+                  description: "We believe in transparency. Watch our progress, provide feedback, and help shape the future of SolCrusher.",
+                },
+                {
+                  title: "Community First",
+                  description: "Your input matters. Join our community channels to participate in key decisions and feature prioritization.",
+                },
+                {
+                  title: "Regular Updates",
+                  description: "Follow our development journey with weekly updates, test new features, and be the first to know about launches.",
+                },
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="space-y-2"
+                >
+                  <h3 className="text-lg font-semibold text-[#9945FF]">{item.title}</h3>
+                  <p className="text-gray-400">{item.description}</p>
+                </motion.div>
+              ))}
+            </div>
+            <div className="mt-8 flex justify-center gap-4">
+              <Link href="https://t.me/solcrusher" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" className="border-[#9945FF] text-[#9945FF] hover:bg-[#9945FF]/10">
+                  Join Community
+                </Button>
+              </Link>
+              <Link href="https://github.com/yourusername/solcrusher" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" className="border-[#9945FF] text-[#9945FF] hover:bg-[#9945FF]/10">
+                  View on GitHub
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Roadmap Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
@@ -279,6 +384,8 @@ export default function HomeFeature() {
           </div>
         </div>
       </section>
+
+      <DevelopmentNotice />
     </div>
   )
 } 
