@@ -36,7 +36,7 @@ type SidebarContextType = {
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined)
 
-export function SidebarProvider({ children }: { children: React.ReactNode }) {
+function Provider({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
   const [collapsible, setCollapsible] = useState<"icon" | "full" | false>("icon")
 
@@ -54,7 +54,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function useSidebar() {
+function useSidebar() {
   const context = useContext(SidebarContext)
   if (!context) {
     throw new Error("useSidebar must be used within a SidebarProvider.")
@@ -661,7 +661,7 @@ export {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarProvider,
+  Provider as SidebarProvider,
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
