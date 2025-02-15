@@ -3,6 +3,8 @@
 import { motion } from "framer-motion"
 import { BarChart2, Wallet, Bot, Shield } from "lucide-react"
 import { TradingInterface } from "@/components/trading/trading-interface"
+import { TokenCreator } from "@/components/trading/token-creator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function DashboardPage() {
   return (
@@ -62,8 +64,19 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Trading Interface */}
-      <TradingInterface />
+      {/* Trading Tabs */}
+      <Tabs defaultValue="trade" className="w-full">
+        <TabsList>
+          <TabsTrigger value="trade">Trade</TabsTrigger>
+          <TabsTrigger value="create">Create Token</TabsTrigger>
+        </TabsList>
+        <TabsContent value="trade">
+          <TradingInterface />
+        </TabsContent>
+        <TabsContent value="create">
+          <TokenCreator />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
