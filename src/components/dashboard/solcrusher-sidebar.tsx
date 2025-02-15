@@ -13,7 +13,12 @@ import {
   Star,
   PieChart,
   Coins,
+  PanelLeft,
 } from "lucide-react"
+import { useSidebar } from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
@@ -139,11 +144,40 @@ const data = {
   ],
 }
 
-export function SolCrusherSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function SolCrusherSidebar({ className, ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { collapsed, setCollapsed } = useSidebar()
+
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar 
+      collapsible="icon" 
+      className={cn(
+        "border-r border-purple-500/20 bg-[#1E1B2E] transition-all duration-300",
+        collapsed ? "w-16" : "w-64",
+        className
+      )} 
+      {...props}
+    >
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-2">
+            <Image 
+              src="/logo.png"
+              alt="SolCrusher Logo"
+              width={32}
+              height={32}
+              className="w-8 h-8"
+            />
+            {!collapsed && <span className="text-xl font-bold">SolCrusher</span>}
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden md:flex"
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            <PanelLeft className={`h-4 w-4 transition-transform ${collapsed ? 'rotate-180' : ''}`} />
+          </Button>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
