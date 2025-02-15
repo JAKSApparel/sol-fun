@@ -52,7 +52,6 @@ export class TradingService {
     signTransaction: (transaction: Transaction) => Promise<Transaction>
   }) {
     try {
-      // Get the token accounts
       const sourceATA = await getAssociatedTokenAddress(
         mint,
         fromPubkey,
@@ -67,7 +66,6 @@ export class TradingService {
         TOKEN_PROGRAM_ID
       )
 
-      // Create transaction
       const transaction = new Transaction()
 
       // Check if destination token account exists
@@ -84,7 +82,6 @@ export class TradingService {
         )
       }
 
-      // Add transfer instruction
       transaction.add(
         createTransferInstruction(
           sourceATA,
@@ -96,12 +93,10 @@ export class TradingService {
         )
       )
 
-      // Get latest blockhash
       const latestBlockhash = await this.connection.getLatestBlockhash()
       transaction.recentBlockhash = latestBlockhash.blockhash
       transaction.feePayer = fromPubkey
 
-      // Sign and send transaction
       const signed = await signTransaction(transaction)
       const signature = await this.connection.sendRawTransaction(signed.serialize())
       await this.connection.confirmTransaction(signature)
