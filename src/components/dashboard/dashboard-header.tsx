@@ -20,33 +20,22 @@ import { ThemeToggle } from "@/components/theme-toggle"
 function DesktopHeader({ balance }: { balance: number | null }) {
   return (
     <div className="hidden lg:flex h-16 items-center justify-between px-4">
-      <div className="flex items-center gap-4">
-        <Image 
-          src="/logo.svg" 
-          alt="SolCrusher"
-          width={32}
-          height={32}
-          className="w-8 h-8"
-        />
-        <span className="font-bold text-lg">SolCrusher</span>
-      </div>
-
-      <div className="flex-1 max-w-2xl mx-8">
+      <div className="flex-1 max-w-2xl">
         <div className="relative">
           <input 
             type="text" 
             placeholder="Search tokens or paste address"
-            className="w-full bg-background border border-input rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#14F195]"
+            className="w-full bg-background/50 border border-border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <Search className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground" />
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 ml-4">
         <ThemeToggle />
         <NetworkSelector />
         {balance !== null && (
-          <Button variant="ghost" className="flex items-center gap-2 px-4 py-2 bg-background rounded-full border border-input">
+          <Button variant="ghost" className="flex items-center gap-2 px-4 py-2 bg-background/50 rounded-full border border-border">
             <Image 
               src="/sol.svg"
               alt="SOL"
@@ -65,21 +54,10 @@ function DesktopHeader({ balance }: { balance: number | null }) {
 
 function MobileHeader({ balance }: { balance: number | null }) {
   return (
-    <div className="lg:hidden flex h-16 items-center justify-between px-4">
-      <div className="flex items-center gap-2">
-        <Image 
-          src="/logo.svg" 
-          alt="SolCrusher"
-          width={32}
-          height={32}
-          className="w-8 h-8"
-        />
-        <span className="font-bold text-lg">SolCrusher</span>
-      </div>
-
+    <div className="lg:hidden flex h-16 items-center justify-end px-4">
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className="hover:bg-background">
+          <Button variant="ghost" size="icon" className="hover:bg-[#1E1B2E]">
             <Menu className="h-6 w-6" />
           </Button>
         </PopoverTrigger>
@@ -151,7 +129,7 @@ export function DashboardHeader() {
   }, [publicKey, connection])
 
   return (
-    <div className="fixed top-0 right-0 left-0 z-30 border-b border-purple-500/20 bg-background/80 backdrop-blur-sm lg:left-64">
+    <div className="fixed top-0 right-0 left-0 z-30 border-b border-purple-500/20 bg-[#0F0D1B]/80 backdrop-blur-sm lg:left-64">
       <DesktopHeader balance={balance} />
       <MobileHeader balance={balance} />
     </div>

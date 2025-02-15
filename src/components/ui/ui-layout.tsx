@@ -105,3 +105,6 @@ export function useTransactionToast() {
     )
   }
 }
+
+<aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-background/80 backdrop-blur-sm">
+</aside>

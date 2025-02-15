@@ -120,7 +120,7 @@ export function TradingInterface() {
   return (
     <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
       {/* Stats Cards */}
-      <Card className="col-span-1">
+      <Card className="col-span-1 bg-[#1E1B2E] border-purple-500/20">
         <CardHeader>
           <CardTitle>Portfolio Value</CardTitle>
         </CardHeader>
@@ -130,7 +130,7 @@ export function TradingInterface() {
         </CardContent>
       </Card>
 
-      <Card className="col-span-1">
+      <Card className="col-span-1 bg-[#1E1B2E] border-purple-500/20">
         <CardHeader>
           <CardTitle>24h Trading Volume</CardTitle>
         </CardHeader>
@@ -140,7 +140,7 @@ export function TradingInterface() {
         </CardContent>
       </Card>
 
-      <Card className="col-span-1">
+      <Card className="col-span-1 bg-[#1E1B2E] border-purple-500/20">
         <CardHeader>
           <CardTitle>AI Trades</CardTitle>
         </CardHeader>
@@ -150,7 +150,7 @@ export function TradingInterface() {
         </CardContent>
       </Card>
 
-      <Card className="col-span-1">
+      <Card className="col-span-1 bg-[#1E1B2E] border-purple-500/20">
         <CardHeader>
           <CardTitle>Risk Score</CardTitle>
         </CardHeader>
@@ -162,7 +162,7 @@ export function TradingInterface() {
 
       {/* Main Content */}
       <div className="col-span-1 lg:col-span-2">
-        <Card className="mb-4">
+        <Card className="bg-[#1E1B2E] border-purple-500/20 mb-4">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Price Chart</CardTitle>
@@ -181,7 +181,7 @@ export function TradingInterface() {
 
         <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
           {/* Trading Interface */}
-          <Card>
+          <Card className="bg-[#1E1B2E] border-purple-500/20">
             <CardHeader>
               <CardTitle>Trade</CardTitle>
             </CardHeader>
@@ -245,7 +245,7 @@ export function TradingInterface() {
           </Card>
 
           {/* Order Book */}
-          <Card>
+          <Card className="bg-[#1E1B2E] border-purple-500/20">
             <CardHeader>
               <CardTitle>Order Book</CardTitle>
             </CardHeader>
