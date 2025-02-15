@@ -78,7 +78,7 @@ export function CreateToken() {
         <CardHeader>
           <CardTitle>Create Memecoin</CardTitle>
           <CardDescription>
-            Launch your own memecoin with custom parameters. All tokens will end with "crush"
+            Launch your own memecoin with custom parameters. All tokens will end with &quot;crush&quot;
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
