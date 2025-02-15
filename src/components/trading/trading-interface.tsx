@@ -23,6 +23,8 @@ import { ArrowDownUp, TrendingUp, TrendingDown } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { TradingService } from '@/lib/services/trading-service'
 import { MarketService } from '@/lib/services/market-service'
+import { PublicKey } from '@solana/web3.js'
+import { CreateToken } from '@/components/token/create-token'
 
 type TokenPair = {
   name: string
@@ -32,9 +34,9 @@ type TokenPair = {
 }
 
 const MOCK_TOKEN_PAIRS: TokenPair[] = [
-  { name: 'SOL/USDC', address: '0x...', price: 109.45, change24h: 5.23 },
-  { name: 'BONK/USDC', address: '0x...', price: 0.00001234, change24h: -2.34 },
-  { name: 'JUP/USDC', address: '0x...', price: 0.845, change24h: 12.56 },
+  { name: 'SOL/USDC', address: 'So11111111111111111111111111111111111111112', price: 109.45, change24h: 5.23 },
+  { name: 'BONK/USDC', address: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', price: 0.00001234, change24h: -2.34 },
+  { name: 'JUP/USDC', address: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZxPGvXq', price: 0.845, change24h: 12.56 },
 ]
 
 // Create a consistent initial order book data
@@ -61,52 +63,55 @@ export function TradingInterface() {
   const [amount, setAmount] = useState('')
   const [orderType, setOrderType] = useState('market')
   const [tradeType, setTradeType] = useState('buy')
-  const [orderBook, setOrderBook] = useState(() => 
-    createInitialOrderBook(selectedPair.price)
-  )
-  const [tradingService, setTradingService] = useState<TradingService | null>(null)
-  const [marketService, setMarketService] = useState<MarketService | null>(null)
+  const [orderBook, setOrderBook] = useState<{
+    asks: Array<{ price: number; amount: number; total: number }>
+    bids: Array<{ price: number; amount: number; total: number }>
+  }>({ asks: [], bids: [] })
+  const [tradingService] = useState(new TradingService(connection))
+  const [marketService] = useState(new MarketService(connection))
   const [routes, setRoutes] = useState([])
   const [selectedRoute, setSelectedRoute] = useState(null)
 
-  // Update order book periodically on client side only
+  // Update order book periodically
   useEffect(() => {
-    const interval = setInterval(() => {
-      setOrderBook(prev => {
-        const newBasePrice = selectedPair.price + (Math.random() - 0.5) * 0.2
-        return createInitialOrderBook(newBasePrice)
-      })
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [selectedPair.price])
-
-  useEffect(() => {
-    if (connection) {
-      const trading = new TradingService(connection)
-      const market = new MarketService(connection)
-      trading.initialize().then(() => {
-        setTradingService(trading)
-        setMarketService(market)
-      })
+    const fetchOrderBook = async () => {
+      try {
+        const book = await marketService.getOrderbook(selectedPair.address)
+        setOrderBook(book)
+      } catch (error) {
+        console.error('Failed to fetch orderbook:', error)
+      }
     }
-  }, [connection])
+
+    fetchOrderBook()
+    const interval = setInterval(fetchOrderBook, 5000)
+    return () => clearInterval(interval)
+  }, [selectedPair.address, marketService])
 
   const handleTrade = async () => {
-    if (!publicKey || !signTransaction || !tradingService) {
+    if (!publicKey || !signTransaction) {
       toast.error('Please connect your wallet')
       return
     }
 
+    if (!amount || isNaN(Number(amount))) {
+      toast.error('Please enter a valid amount')
+      return
+    }
+
     try {
-      const txids = await tradingService.executeSwap({
-        route: selectedRoute,
-        userPublicKey: publicKey,
+      const tokenMint = new PublicKey(selectedPair.address)
+      const destinationAddress = new PublicKey('YOUR_DESTINATION_ADDRESS') // Replace with actual destination
+
+      const signature = await tradingService.transfer({
+        fromPubkey: publicKey,
+        toPubkey: destinationAddress,
+        mint: tokenMint,
+        amount: Number(amount),
         signTransaction,
       })
-      
-      toast.success('Trade executed successfully!')
-      console.log('Transaction IDs:', txids)
+
+      toast.success(`Transaction successful! Signature: ${signature.slice(0, 8)}...`)
     } catch (error) {
       console.error('Trade failed:', error)
       toast.error('Trade failed. Please try again.')
@@ -115,132 +120,146 @@ export function TradingInterface() {
 
   return (
     <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-      {/* Trading Chart */}
-      <Card className="col-span-1 lg:col-span-2">
-        <CardHeader>
-          <CardTitle>Price Chart</CardTitle>
-          <CardDescription className="flex items-center gap-2">
-            {selectedPair.name} • ${selectedPair.price.toFixed(4)}
-            <span className={`inline-flex items-center ${selectedPair.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {selectedPair.change24h >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-              {selectedPair.change24h}%
-            </span>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px] lg:h-[400px] flex items-center justify-center bg-muted/5 rounded-lg">
-            <p className="text-muted-foreground">Chart Coming Soon</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Trading Interface */}
-      <Card className="order-first lg:order-none">
-        <CardHeader>
-          <CardTitle>Trade</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="buy" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="buy" onClick={() => setTradeType('buy')}>Buy</TabsTrigger>
-              <TabsTrigger value="sell" onClick={() => setTradeType('sell')}>Sell</TabsTrigger>
-            </TabsList>
-            <div className="mt-4 space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Token Pair</label>
-                <Select onValueChange={(value) => setSelectedPair(MOCK_TOKEN_PAIRS.find(p => p.name === value)!)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={selectedPair.name} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MOCK_TOKEN_PAIRS.map((pair) => (
-                      <SelectItem key={pair.name} value={pair.name}>
-                        {pair.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+      <Tabs defaultValue="trade" className="col-span-1 lg:col-span-2">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Trading Dashboard</h2>
+          <TabsList>
+            <TabsTrigger value="trade">Trade</TabsTrigger>
+            <TabsTrigger value="create">Create Token</TabsTrigger>
+          </TabsList>
+        </div>
+        <TabsContent value="trade">
+          {/* Trading Chart */}
+          <Card className="col-span-1 lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Price Chart</CardTitle>
+              <CardDescription className="flex items-center gap-2">
+                {selectedPair.name} • ${selectedPair.price.toFixed(4)}
+                <span className={`inline-flex items-center ${selectedPair.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {selectedPair.change24h >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                  {selectedPair.change24h}%
+                </span>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] lg:h-[400px] flex items-center justify-center bg-muted/5 rounded-lg">
+                <p className="text-muted-foreground">Chart Coming Soon</p>
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Order Type</label>
-                <Select defaultValue={orderType} onValueChange={setOrderType}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="market">Market</SelectItem>
-                    <SelectItem value="limit">Limit</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Amount</label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-              </div>
-
-              <Button 
-                className="w-full"
-                onClick={handleTrade}
-                disabled={!publicKey || !amount}
-              >
-                <ArrowDownUp className="mr-2 h-4 w-4" />
-                {tradeType === 'buy' ? 'Buy' : 'Sell'} {selectedPair.name.split('/')[0]}
-              </Button>
-            </div>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {/* Order Book */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Order Book</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 text-sm font-medium">
-              <div>Price</div>
-              <div>Amount</div>
-              <div>Total</div>
-            </div>
-            <div className="space-y-1">
-              {/* Asks (Sell orders) */}
-              {orderBook.asks.map((order, i) => (
-                <div key={`ask-${i}`} className="grid grid-cols-3 text-sm">
-                  <div className="text-red-500">
-                    ${order.price.toFixed(4)}
+          {/* Trading Interface */}
+          <Card className="order-first lg:order-none">
+            <CardHeader>
+              <CardTitle>Trade</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="buy" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="buy" onClick={() => setTradeType('buy')}>Buy</TabsTrigger>
+                  <TabsTrigger value="sell" onClick={() => setTradeType('sell')}>Sell</TabsTrigger>
+                </TabsList>
+                <div className="mt-4 space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Token Pair</label>
+                    <Select onValueChange={(value) => setSelectedPair(MOCK_TOKEN_PAIRS.find(p => p.name === value)!)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={selectedPair.name} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MOCK_TOKEN_PAIRS.map((pair) => (
+                          <SelectItem key={pair.name} value={pair.name}>
+                            {pair.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div>{order.amount.toFixed(4)}</div>
-                  <div>{order.total.toFixed(2)}</div>
-                </div>
-              ))}
-              
-              {/* Current price */}
-              <div className="py-2 text-center text-sm font-medium">
-                ${selectedPair.price.toFixed(4)}
-              </div>
 
-              {/* Bids (Buy orders) */}
-              {orderBook.bids.map((order, i) => (
-                <div key={`bid-${i}`} className="grid grid-cols-3 text-sm">
-                  <div className="text-green-500">
-                    ${order.price.toFixed(4)}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Order Type</label>
+                    <Select defaultValue={orderType} onValueChange={setOrderType}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="market">Market</SelectItem>
+                        <SelectItem value="limit">Limit</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div>{order.amount.toFixed(4)}</div>
-                  <div>{order.total.toFixed(2)}</div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Amount</label>
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                    />
+                  </div>
+
+                  <Button 
+                    className="w-full"
+                    onClick={handleTrade}
+                    disabled={!publicKey || !amount}
+                  >
+                    <ArrowDownUp className="mr-2 h-4 w-4" />
+                    {tradeType === 'buy' ? 'Buy' : 'Sell'} {selectedPair.name.split('/')[0]}
+                  </Button>
                 </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          {/* Order Book */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Order Book</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 text-sm font-medium">
+                  <div>Price</div>
+                  <div>Amount</div>
+                  <div>Total</div>
+                </div>
+                <div className="space-y-1">
+                  {/* Asks (Sell orders) */}
+                  {orderBook.asks.map((order, i) => (
+                    <div key={`ask-${i}`} className="grid grid-cols-3 text-sm">
+                      <div className="text-red-500">
+                        ${order.price.toFixed(4)}
+                      </div>
+                      <div>{order.amount.toFixed(4)}</div>
+                      <div>{order.total.toFixed(2)}</div>
+                    </div>
+                  ))}
+                  
+                  {/* Current price */}
+                  <div className="py-2 text-center text-sm font-medium">
+                    ${selectedPair.price.toFixed(4)}
+                  </div>
+
+                  {/* Bids (Buy orders) */}
+                  {orderBook.bids.map((order, i) => (
+                    <div key={`bid-${i}`} className="grid grid-cols-3 text-sm">
+                      <div className="text-green-500">
+                        ${order.price.toFixed(4)}
+                      </div>
+                      <div>{order.amount.toFixed(4)}</div>
+                      <div>{order.total.toFixed(2)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="create">
+          <CreateToken />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 } 

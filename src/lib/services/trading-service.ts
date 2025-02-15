@@ -1,118 +1,170 @@
 'use client'
 
-import { Connection, PublicKey } from '@solana/web3.js'
-import { Jupiter } from '@jup-ag/core'
+import { 
+  Connection, 
+  PublicKey, 
+  Transaction,
+  SystemProgram,
+  LAMPORTS_PER_SOL
+} from '@solana/web3.js'
+import { 
+  TOKEN_PROGRAM_ID,
+  createTransferInstruction,
+  getAssociatedTokenAddress,
+  createAssociatedTokenAccountInstruction,
+} from '@solana/spl-token'
 
 export class TradingService {
-  private jupiter: Jupiter | null = null
   private connection: Connection
 
   constructor(connection: Connection) {
     this.connection = connection
   }
 
-  async initialize() {
+  async getTokenBalance(tokenMint: PublicKey, owner: PublicKey) {
     try {
-      this.jupiter = await Jupiter.load({
-        connection: this.connection,
-        cluster: 'mainnet-beta',
-        platformFeeAndAccounts: undefined,
-        routeCacheDuration: 0,
-        wrapUnwrapSOL: true,
-      })
-    } catch (error) {
-      console.error('Failed to initialize Jupiter:', error)
-      throw error
-    }
-  }
-
-  async getRoutes({
-    inputMint,
-    outputMint,
-    amount,
-    slippage = 1,
-  }: {
-    inputMint: string
-    outputMint: string
-    amount: number
-    slippage?: number
-  }) {
-    if (!this.jupiter) throw new Error('Jupiter not initialized')
-
-    try {
-      const routes = await this.jupiter.computeRoutes({
-        inputMint: new PublicKey(inputMint),
-        outputMint: new PublicKey(outputMint),
-        amount,
-        slippageBps: slippage * 100,
-        onlyDirectRoutes: false,
-      })
-
-      return routes.routesInfos
-    } catch (error) {
-      console.error('Failed to get routes:', error)
-      throw error
-    }
-  }
-
-  async executeSwap({
-    route,
-    userPublicKey,
-    signTransaction,
-  }: {
-    route: any
-    userPublicKey: PublicKey
-    signTransaction: (transaction: any) => Promise<any>
-  }) {
-    if (!this.jupiter) throw new Error('Jupiter not initialized')
-
-    try {
-      const { transactions } = await this.jupiter.exchange({
-        routeInfo: route,
-        userPublicKey,
-      })
-
-      const signedTransaction = await signTransaction(transactions.swapTransaction)
-      const txid = await this.connection.sendRawTransaction(
-        signedTransaction.serialize()
+      const tokenAccount = await getAssociatedTokenAddress(
+        tokenMint,
+        owner,
+        false,
+        TOKEN_PROGRAM_ID
       )
 
-      await this.connection.confirmTransaction(txid, 'confirmed')
-      return txid
+      const balance = await this.connection.getTokenAccountBalance(tokenAccount)
+      return balance.value.uiAmount
     } catch (error) {
-      console.error('Swap failed:', error)
+      console.error('Failed to get token balance:', error)
       throw error
     }
   }
 
-  async getTokenAccounts(userPublicKey: PublicKey) {
-    if (!this.jupiter) throw new Error('Jupiter not initialized')
-    const tokens = await this.jupiter.getDepositAndFeeForUser(userPublicKey)
-    return tokens
+  async transfer({
+    fromPubkey,
+    toPubkey,
+    mint,
+    amount,
+    signTransaction,
+  }: {
+    fromPubkey: PublicKey
+    toPubkey: PublicKey
+    mint: PublicKey
+    amount: number
+    signTransaction: (transaction: Transaction) => Promise<Transaction>
+  }) {
+    try {
+      // Get the token accounts
+      const sourceATA = await getAssociatedTokenAddress(
+        mint,
+        fromPubkey,
+        false,
+        TOKEN_PROGRAM_ID
+      )
+
+      const destinationATA = await getAssociatedTokenAddress(
+        mint,
+        toPubkey,
+        false,
+        TOKEN_PROGRAM_ID
+      )
+
+      // Create transaction
+      const transaction = new Transaction()
+
+      // Check if destination token account exists
+      const destinationAccount = await this.connection.getAccountInfo(destinationATA)
+      if (!destinationAccount) {
+        transaction.add(
+          createAssociatedTokenAccountInstruction(
+            fromPubkey,
+            destinationATA,
+            toPubkey,
+            mint,
+            TOKEN_PROGRAM_ID
+          )
+        )
+      }
+
+      // Add transfer instruction
+      transaction.add(
+        createTransferInstruction(
+          sourceATA,
+          destinationATA,
+          fromPubkey,
+          amount,
+          [],
+          TOKEN_PROGRAM_ID
+        )
+      )
+
+      // Get latest blockhash
+      const latestBlockhash = await this.connection.getLatestBlockhash()
+      transaction.recentBlockhash = latestBlockhash.blockhash
+      transaction.feePayer = fromPubkey
+
+      // Sign and send transaction
+      const signed = await signTransaction(transaction)
+      const signature = await this.connection.sendRawTransaction(signed.serialize())
+      await this.connection.confirmTransaction(signature)
+
+      return signature
+    } catch (error) {
+      console.error('Transfer failed:', error)
+      throw error
+    }
   }
 
-  async getQuote({
-    inputMint,
-    outputMint,
-    amount,
-  }: {
-    inputMint: string
-    outputMint: string
-    amount: number
-  }) {
-    if (!this.jupiter) throw new Error('Jupiter not initialized')
-
+  async getTokenAccounts(owner: PublicKey) {
     try {
-      const routes = await this.getRoutes({
-        inputMint,
-        outputMint,
-        amount,
-      })
+      const accounts = await this.connection.getParsedTokenAccountsByOwner(
+        owner,
+        { programId: TOKEN_PROGRAM_ID }
+      )
 
-      if (routes.length === 0) throw new Error('No routes found')
-      return routes[0] // Best route
+      return accounts.value.map(account => ({
+        mint: account.account.data.parsed.info.mint,
+        amount: account.account.data.parsed.info.tokenAmount.uiAmount,
+        address: account.pubkey.toString(),
+      }))
     } catch (error) {
-      console.error('Failed to get quote:', error)
+      console.error('Failed to get token accounts:', error)
+      throw error
+    }
+  }
+
+  async createTokenAccount(
+    owner: PublicKey,
+    mint: PublicKey,
+    signTransaction: (transaction: Transaction) => Promise<Transaction>
+  ) {
+    try {
+      const ata = await getAssociatedTokenAddress(
+        mint,
+        owner,
+        false,
+        TOKEN_PROGRAM_ID
+      )
+
+      const transaction = new Transaction().add(
+        createAssociatedTokenAccountInstruction(
+          owner,
+          ata,
+          owner,
+          mint,
+          TOKEN_PROGRAM_ID
+        )
+      )
+
+      const latestBlockhash = await this.connection.getLatestBlockhash()
+      transaction.recentBlockhash = latestBlockhash.blockhash
+      transaction.feePayer = owner
+
+      const signed = await signTransaction(transaction)
+      const signature = await this.connection.sendRawTransaction(signed.serialize())
+      await this.connection.confirmTransaction(signature)
+
+      return ata
+    } catch (error) {
+      console.error('Failed to create token account:', error)
       throw error
     }
   }
