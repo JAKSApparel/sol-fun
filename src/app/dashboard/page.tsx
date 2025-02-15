@@ -3,14 +3,20 @@
 import { motion } from "framer-motion"
 import { BarChart2, Wallet, Bot, Shield } from "lucide-react"
 import { TradingInterface } from "@/components/trading/trading-interface"
-import { TokenCreator } from "@/components/trading/token-creator"
+import { CreateToken } from "@/components/token/create-token"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Trading Dashboard</h1>
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Trading Dashboard</h1>
+        <Tabs defaultValue="trade">
+          <TabsList>
+            <TabsTrigger value="trade">Trade</TabsTrigger>
+            <TabsTrigger value="create">Create Token</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Quick Stats */}
@@ -64,17 +70,12 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Trading Tabs */}
-      <Tabs defaultValue="trade" className="w-full">
-        <TabsList>
-          <TabsTrigger value="trade">Trade</TabsTrigger>
-          <TabsTrigger value="create">Create Token</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="trade">
         <TabsContent value="trade">
           <TradingInterface />
         </TabsContent>
         <TabsContent value="create">
-          <TokenCreator />
+          <CreateToken />
         </TabsContent>
       </Tabs>
     </div>

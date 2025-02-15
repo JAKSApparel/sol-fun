@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -120,36 +119,69 @@ export function TradingInterface() {
 
   return (
     <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-      <Tabs defaultValue="trade" className="col-span-1 lg:col-span-2">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Trading Dashboard</h2>
-          <TabsList>
-            <TabsTrigger value="trade">Trade</TabsTrigger>
-            <TabsTrigger value="create">Create Token</TabsTrigger>
-          </TabsList>
-        </div>
-        <TabsContent value="trade">
-          {/* Trading Chart */}
-          <Card className="col-span-1 lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Price Chart</CardTitle>
-              <CardDescription className="flex items-center gap-2">
-                {selectedPair.name} • ${selectedPair.price.toFixed(4)}
-                <span className={`inline-flex items-center ${selectedPair.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {selectedPair.change24h >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                  {selectedPair.change24h}%
-                </span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] lg:h-[400px] flex items-center justify-center bg-muted/5 rounded-lg">
-                <p className="text-muted-foreground">Chart Coming Soon</p>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Stats Cards */}
+      <Card className="col-span-1">
+        <CardHeader>
+          <CardTitle>Portfolio Value</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">${"12,345.67"}</div>
+          <div className="text-green-500">+5.23%</div>
+        </CardContent>
+      </Card>
 
+      <Card className="col-span-1">
+        <CardHeader>
+          <CardTitle>24h Trading Volume</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">${"45,678.90"}</div>
+          <div className="text-purple-500">+12.34%</div>
+        </CardContent>
+      </Card>
+
+      <Card className="col-span-1">
+        <CardHeader>
+          <CardTitle>AI Trades</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">24</div>
+          <div className="text-blue-500">+8</div>
+        </CardContent>
+      </Card>
+
+      <Card className="col-span-1">
+        <CardHeader>
+          <CardTitle>Risk Score</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">Low</div>
+          <div className="text-green-500">Stable</div>
+        </CardContent>
+      </Card>
+
+      {/* Main Content */}
+      <div className="col-span-1 lg:col-span-2">
+        <Card className="mb-4">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Price Chart</CardTitle>
+              <div className="flex items-center gap-2">
+                <span>{selectedPair.name}</span>
+                <span className={selectedPair.change24h >= 0 ? 'text-green-500' : 'text-red-500'}>
+                  {selectedPair.change24h >= 0 ? '+' : ''}{selectedPair.change24h}%
+                </span>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-12">Chart Coming Soon</div>
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
           {/* Trading Interface */}
-          <Card className="order-first lg:order-none">
+          <Card>
             <CardHeader>
               <CardTitle>Trade</CardTitle>
             </CardHeader>
@@ -255,11 +287,8 @@ export function TradingInterface() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="create">
-          <CreateToken />
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   )
 } 
