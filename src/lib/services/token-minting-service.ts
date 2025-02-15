@@ -17,12 +17,15 @@ import {
   createMintToInstruction,
 } from '@solana/spl-token'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { TokenMetadataService } from './token-metadata-service'
 
 export class TokenMintingService {
   private connection: Connection
+  private metadataService: TokenMetadataService
 
   constructor(connection: Connection) {
     this.connection = connection
+    this.metadataService = new TokenMetadataService(connection)
   }
 
   async createToken({
@@ -31,6 +34,7 @@ export class TokenMintingService {
     symbol,
     decimals = 9,
     initialSupply,
+    uri,
     signTransaction,
   }: {
     payer: PublicKey
@@ -38,6 +42,7 @@ export class TokenMintingService {
     symbol: string
     decimals?: number
     initialSupply: number
+    uri?: string
     signTransaction: (transaction: Transaction) => Promise<Transaction>
   }) {
     try {
@@ -118,6 +123,19 @@ export class TokenMintingService {
       // Send and confirm transaction
       const signature = await this.connection.sendRawTransaction(signed.serialize())
       await this.connection.confirmTransaction(signature)
+
+      // Add metadata if URI is provided
+      if (uri) {
+        await this.metadataService.createMetadata({
+          mint: mintPubkey,
+          name,
+          symbol,
+          uri,
+          payer,
+          updateAuthority: payer,
+          signTransaction,
+        })
+      }
 
       return {
         signature,
