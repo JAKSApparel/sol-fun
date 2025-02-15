@@ -10,6 +10,7 @@ import {ExplorerLink} from '../cluster/cluster-ui'
 export function UiLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background font-sans antialiased">
+      <Toaster position="bottom-right" />
       {children}
     </div>
   )

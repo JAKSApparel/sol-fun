@@ -6,7 +6,6 @@ import {SolanaProvider} from '@/components/solana/solana-provider'
 import {UiLayout} from '@/components/ui/ui-layout'
 import {ReactQueryProvider} from './react-query-provider'
 import { SolanaConnectionGuard } from '@/components/solana/solana-connection'
-import { Header } from '@/components/layout/header'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -33,7 +32,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ClusterProvider>
             <SolanaProvider>
               <UiLayout>
-                <Header />
                 <SolanaConnectionGuard>
                   {children}
                 </SolanaConnectionGuard>

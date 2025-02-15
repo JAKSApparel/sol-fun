@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -35,6 +35,23 @@ const MOCK_TOKEN_PAIRS: TokenPair[] = [
   { name: 'JUP/USDC', address: '0x...', price: 0.845, change24h: 12.56 },
 ]
 
+// Create a consistent initial order book data
+const createInitialOrderBook = (basePrice: number) => {
+  const asks = Array.from({ length: 5 }).map((_, i) => ({
+    price: basePrice + i * 0.1,
+    amount: 10 - i,
+    total: (10 - i) * (basePrice + i * 0.1)
+  }))
+
+  const bids = Array.from({ length: 5 }).map((_, i) => ({
+    price: basePrice - i * 0.1,
+    amount: 10 - i,
+    total: (10 - i) * (basePrice - i * 0.1)
+  }))
+
+  return { asks, bids }
+}
+
 export function TradingInterface() {
   const { connection } = useConnection()
   const { publicKey, signTransaction } = useWallet()
@@ -42,6 +59,21 @@ export function TradingInterface() {
   const [amount, setAmount] = useState('')
   const [orderType, setOrderType] = useState('market')
   const [tradeType, setTradeType] = useState('buy')
+  const [orderBook, setOrderBook] = useState(() => 
+    createInitialOrderBook(selectedPair.price)
+  )
+
+  // Update order book periodically on client side only
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setOrderBook(prev => {
+        const newBasePrice = selectedPair.price + (Math.random() - 0.5) * 0.2
+        return createInitialOrderBook(newBasePrice)
+      })
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [selectedPair.price])
 
   const handleTrade = async () => {
     if (!publicKey || !signTransaction) {
@@ -60,29 +92,28 @@ export function TradingInterface() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
       {/* Trading Chart */}
-      <Card className="col-span-2">
+      <Card className="col-span-1 lg:col-span-2">
         <CardHeader>
           <CardTitle>Price Chart</CardTitle>
-          <CardDescription>
+          <CardDescription className="flex items-center gap-2">
             {selectedPair.name} • ${selectedPair.price.toFixed(4)}
-            <span className={`ml-2 ${selectedPair.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {selectedPair.change24h >= 0 ? <TrendingUp className="inline w-4 h-4" /> : <TrendingDown className="inline w-4 h-4" />}
+            <span className={`inline-flex items-center ${selectedPair.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {selectedPair.change24h >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
               {selectedPair.change24h}%
             </span>
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[400px] flex items-center justify-center bg-muted/5 rounded-lg">
-            {/* Integrate your preferred charting library here */}
+          <div className="h-[300px] lg:h-[400px] flex items-center justify-center bg-muted/5 rounded-lg">
             <p className="text-muted-foreground">Chart Coming Soon</p>
           </div>
         </CardContent>
       </Card>
 
       {/* Trading Interface */}
-      <Card>
+      <Card className="order-first lg:order-none">
         <CardHeader>
           <CardTitle>Trade</CardTitle>
         </CardHeader>
@@ -158,22 +189,30 @@ export function TradingInterface() {
               <div>Total</div>
             </div>
             <div className="space-y-1">
-              {/* Mock order book data */}
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="grid grid-cols-3 text-sm">
-                  <div className="text-red-500">${(selectedPair.price + i * 0.1).toFixed(4)}</div>
-                  <div>{(Math.random() * 10).toFixed(4)}</div>
-                  <div>{(Math.random() * 1000).toFixed(2)}</div>
+              {/* Asks (Sell orders) */}
+              {orderBook.asks.map((order, i) => (
+                <div key={`ask-${i}`} className="grid grid-cols-3 text-sm">
+                  <div className="text-red-500">
+                    ${order.price.toFixed(4)}
+                  </div>
+                  <div>{order.amount.toFixed(4)}</div>
+                  <div>{order.total.toFixed(2)}</div>
                 </div>
               ))}
+              
+              {/* Current price */}
               <div className="py-2 text-center text-sm font-medium">
                 ${selectedPair.price.toFixed(4)}
               </div>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="grid grid-cols-3 text-sm">
-                  <div className="text-green-500">${(selectedPair.price - i * 0.1).toFixed(4)}</div>
-                  <div>{(Math.random() * 10).toFixed(4)}</div>
-                  <div>{(Math.random() * 1000).toFixed(2)}</div>
+
+              {/* Bids (Buy orders) */}
+              {orderBook.bids.map((order, i) => (
+                <div key={`bid-${i}`} className="grid grid-cols-3 text-sm">
+                  <div className="text-green-500">
+                    ${order.price.toFixed(4)}
+                  </div>
+                  <div>{order.amount.toFixed(4)}</div>
+                  <div>{order.total.toFixed(2)}</div>
                 </div>
               ))}
             </div>
