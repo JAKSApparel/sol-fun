@@ -2,12 +2,13 @@
 
 import { motion } from "framer-motion"
 import { BarChart2, Wallet, Bot, Shield } from "lucide-react"
+import { TradingInterface } from "@/components/trading/trading-interface"
 
 export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Dashboard Overview</h1>
+        <h1 className="text-2xl font-bold text-white">Trading Dashboard</h1>
       </div>
 
       {/* Quick Stats */}
@@ -61,7 +62,8 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Add more dashboard content here */}
+      {/* Trading Interface */}
+      <TradingInterface />
     </div>
   )
 }
