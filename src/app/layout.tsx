@@ -6,6 +6,7 @@ import {SolanaProvider} from '@/components/solana/solana-provider'
 import {UiLayout} from '@/components/ui/ui-layout'
 import {ReactQueryProvider} from './react-query-provider'
 import { SolanaConnectionGuard } from '@/components/solana/solana-connection'
+import '@/lib/polyfills'
 
 const inter = Inter({ subsets: ['latin'] })
 

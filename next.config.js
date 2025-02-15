@@ -8,10 +8,29 @@ const nextConfig = {
         path: false,
         os: false,
         crypto: false,
+        stream: false,
+        http: false,
+        https: false,
+        zlib: false,
+        net: false,
+        tls: false,
+        'rpc-websockets': require.resolve('rpc-websockets'),
       }
     }
+    config.module.rules.push({
+      test: /\.m?js/,
+      resolve: {
+        fullySpecified: false,
+      },
+    })
     return config
   },
+  transpilePackages: [
+    '@jup-ag/core',
+    '@solana/web3.js',
+    '@project-serum/serum',
+    '@solana/spl-token',
+  ],
 }
 
 module.exports = nextConfig 

@@ -21,6 +21,8 @@ import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ArrowDownUp, TrendingUp, TrendingDown } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { TradingService } from '@/lib/services/trading-service'
+import { MarketService } from '@/lib/services/market-service'
 
 type TokenPair = {
   name: string
@@ -62,6 +64,10 @@ export function TradingInterface() {
   const [orderBook, setOrderBook] = useState(() => 
     createInitialOrderBook(selectedPair.price)
   )
+  const [tradingService, setTradingService] = useState<TradingService | null>(null)
+  const [marketService, setMarketService] = useState<MarketService | null>(null)
+  const [routes, setRoutes] = useState([])
+  const [selectedRoute, setSelectedRoute] = useState(null)
 
   // Update order book periodically on client side only
   useEffect(() => {
@@ -75,20 +81,36 @@ export function TradingInterface() {
     return () => clearInterval(interval)
   }, [selectedPair.price])
 
+  useEffect(() => {
+    if (connection) {
+      const trading = new TradingService(connection)
+      const market = new MarketService(connection)
+      trading.initialize().then(() => {
+        setTradingService(trading)
+        setMarketService(market)
+      })
+    }
+  }, [connection])
+
   const handleTrade = async () => {
-    if (!publicKey || !signTransaction) {
+    if (!publicKey || !signTransaction || !tradingService) {
       toast.error('Please connect your wallet')
       return
     }
 
-    if (!amount || isNaN(Number(amount))) {
-      toast.error('Please enter a valid amount')
-      return
+    try {
+      const txids = await tradingService.executeSwap({
+        route: selectedRoute,
+        userPublicKey: publicKey,
+        signTransaction,
+      })
+      
+      toast.success('Trade executed successfully!')
+      console.log('Transaction IDs:', txids)
+    } catch (error) {
+      console.error('Trade failed:', error)
+      toast.error('Trade failed. Please try again.')
     }
-
-    // Here you would implement the actual trading logic
-    // For now, we'll just show a success message
-    toast.success(`${tradeType.toUpperCase()} order placed successfully!`)
   }
 
   return (

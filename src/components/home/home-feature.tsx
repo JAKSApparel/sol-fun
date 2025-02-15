@@ -183,7 +183,7 @@ export default function HomeFeature() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center"
+          className="text-center mb-16"
         >
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Welcome to <span className="text-[#14F195]">SolCrusher</span>
@@ -196,6 +196,18 @@ export default function HomeFeature() {
               Launch App
             </Button>
           </Link>
+        </motion.div>
+
+        {/* Trading Interface Preview */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="max-w-6xl mx-auto mb-32"
+        >
+          <div className="bg-[#1E1B2E] border border-purple-500/20 rounded-lg p-6">
+            <TradingInterface />
+          </div>
         </motion.div>
 
         {/* Features */}
@@ -221,7 +233,7 @@ export default function HomeFeature() {
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: index * 0.1 + 0.4 }}
               className="bg-[#1E1B2E] p-6 rounded-lg border border-purple-500/20"
             >
               <feature.icon className="w-12 h-12 text-[#14F195] mb-4" />

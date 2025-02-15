@@ -6,8 +6,11 @@ import { Button } from '../ui/button'
 import { Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { cn } from '@/lib/utils'
 
-export function AirdropButton() {
+interface AirdropButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+
+export function AirdropButton({ className, ...props }: AirdropButtonProps) {
   const { connection } = useConnection()
   const { publicKey } = useWallet()
   const [isLoading, setIsLoading] = React.useState(false)
@@ -47,7 +50,8 @@ export function AirdropButton() {
     <Button 
       onClick={handleAirdrop} 
       disabled={isLoading || !publicKey}
-      className="bg-pink-500 hover:bg-pink-600"
+      className={cn("bg-pink-500 hover:bg-pink-600", className)}
+      {...props}
     >
       {isLoading ? (
         <>
