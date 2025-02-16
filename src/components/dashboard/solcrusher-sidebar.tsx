@@ -150,8 +150,9 @@ const data = {
 const navigation = {
   trading: [
     { name: 'Overview', href: '/dashboard', icon: BarChart2 },
-    { name: 'History', href: '/dashboard/history', icon: History },
-    { name: 'Watchlist', href: '/dashboard/watchlist', icon: List },
+    { name: 'Create Token', href: '/dashboard/tokens/create', icon: Coins },
+    { name: 'My Tokens', href: '/dashboard/tokens', icon: Wallet },
+    { name: 'Trading History', href: '/dashboard/history', icon: History },
   ],
   aiTools: [
     { name: 'Market Analysis', href: '/dashboard/market-analysis', icon: BarChart2 },

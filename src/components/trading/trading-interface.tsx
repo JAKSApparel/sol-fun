@@ -55,13 +55,13 @@ const createInitialOrderBook = (basePrice: number) => {
   return { asks, bids }
 }
 
-export function TradingInterface() {
+export function TradingInterface({ initialToken }: { initialToken?: string }) {
   const { connection } = useConnection()
   const { publicKey, signTransaction } = useWallet()
   const [selectedPair, setSelectedPair] = useState<TokenPair>(MOCK_TOKEN_PAIRS[0])
   const [amount, setAmount] = useState('')
   const [orderType, setOrderType] = useState('market')
-  const [tradeType, setTradeType] = useState('buy')
+  const [tradeType, setTradeType] = useState<'buy' | 'sell'>('buy')
   const [orderBook, setOrderBook] = useState<{
     asks: Array<{ price: number; amount: number; total: number }>
     bids: Array<{ price: number; amount: number; total: number }>
@@ -183,63 +183,97 @@ export function TradingInterface() {
           {/* Trading Interface */}
           <Card className="bg-[#1E1B2E] border-purple-500/20">
             <CardHeader>
-              <CardTitle>Trade</CardTitle>
+              <CardTitle>Quick Trade</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="buy" className="w-full">
+              <Tabs defaultValue="market" className="space-y-4">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="buy" onClick={() => setTradeType('buy')}>Buy</TabsTrigger>
-                  <TabsTrigger value="sell" onClick={() => setTradeType('sell')}>Sell</TabsTrigger>
+                  <TabsTrigger value="market">Market</TabsTrigger>
+                  <TabsTrigger value="limit">Limit</TabsTrigger>
                 </TabsList>
-                <div className="mt-4 space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Token Pair</label>
-                    <Select onValueChange={(value) => setSelectedPair(MOCK_TOKEN_PAIRS.find(p => p.name === value)!)}>
+
+                <TabsContent value="market" className="space-y-4">
+                  <div className="space-y-4">
+                    {/* Token Selection */}
+                    <Select
+                      value={selectedPair.address}
+                      onValueChange={(value) => {
+                        const pair = MOCK_TOKEN_PAIRS.find(p => p.address === value)
+                        if (pair) setSelectedPair(pair)
+                      }}
+                    >
                       <SelectTrigger>
-                        <SelectValue placeholder={selectedPair.name} />
+                        <SelectValue placeholder="Select token pair" />
                       </SelectTrigger>
                       <SelectContent>
                         {MOCK_TOKEN_PAIRS.map((pair) => (
-                          <SelectItem key={pair.name} value={pair.name}>
-                            {pair.name}
+                          <SelectItem key={pair.address} value={pair.address}>
+                            <div className="flex items-center justify-between w-full">
+                              <span>{pair.name}</span>
+                              <span className="text-sm text-gray-400">
+                                ${pair.price.toFixed(6)}
+                              </span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Order Type</label>
-                    <Select defaultValue={orderType} onValueChange={setOrderType}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="market">Market</SelectItem>
-                        <SelectItem value="limit">Limit</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    {/* Trade Type Toggle */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant={tradeType === 'buy' ? 'default' : 'outline'}
+                        onClick={() => setTradeType('buy')}
+                        className={tradeType === 'buy' ? 'bg-[#14F195] text-black hover:bg-[#14F195]/90' : ''}
+                      >
+                        Buy
+                      </Button>
+                      <Button
+                        variant={tradeType === 'sell' ? 'default' : 'outline'}
+                        onClick={() => setTradeType('sell')}
+                        className={tradeType === 'sell' ? 'bg-red-500 hover:bg-red-600' : ''}
+                      >
+                        Sell
+                      </Button>
+                    </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Amount</label>
-                    <Input
-                      type="number"
-                      placeholder="0.00"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                    />
-                  </div>
+                    {/* Amount Input */}
+                    <div className="space-y-2">
+                      <Input
+                        type="number"
+                        placeholder="Amount"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                      />
+                      <div className="flex justify-between text-sm">
+                        <span>Price</span>
+                        <span>${selectedPair.price.toFixed(6)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>24h Change</span>
+                        <span className={selectedPair.change24h >= 0 ? 'text-[#14F195]' : 'text-red-500'}>
+                          {selectedPair.change24h >= 0 ? '+' : ''}{selectedPair.change24h}%
+                        </span>
+                      </div>
+                    </div>
 
-                  <Button 
-                    className="w-full"
-                    onClick={handleTrade}
-                    disabled={!publicKey || !amount}
-                  >
-                    <ArrowDownUp className="mr-2 h-4 w-4" />
-                    {tradeType === 'buy' ? 'Buy' : 'Sell'} {selectedPair.name.split('/')[0]}
-                  </Button>
-                </div>
+                    {/* Trade Button */}
+                    <Button 
+                      className="w-full"
+                      disabled={!publicKey || !amount}
+                    >
+                      {!publicKey 
+                        ? 'Connect Wallet' 
+                        : `${tradeType === 'buy' ? 'Buy' : 'Sell'} ${selectedPair.name.split('/')[0]}`}
+                    </Button>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="limit">
+                  <div className="py-6 text-center text-sm text-gray-400">
+                    Limit orders coming soon
+                  </div>
+                </TabsContent>
               </Tabs>
             </CardContent>
           </Card>

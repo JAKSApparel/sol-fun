@@ -8,6 +8,7 @@ import {ReactQueryProvider} from './react-query-provider'
 import { SolanaConnectionGuard } from '@/components/solana/solana-connection'
 import '@/lib/polyfills'
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -39,11 +40,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ReactQueryProvider>
             <ClusterProvider>
               <SolanaProvider>
-                <UiLayout>
-                  <SolanaConnectionGuard>
-                    {children}
-                  </SolanaConnectionGuard>
-                </UiLayout>
+                <SolanaConnectionGuard>
+                  {children}
+                </SolanaConnectionGuard>
+                <Toaster position="bottom-right" />
               </SolanaProvider>
             </ClusterProvider>
           </ReactQueryProvider>

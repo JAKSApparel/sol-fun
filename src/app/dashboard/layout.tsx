@@ -49,25 +49,11 @@ export default function DashboardLayout({
       <div className="lg:pl-64">
         {/* Header */}
         <div className="sticky top-0 z-40">
-          <div className="flex h-16 items-center gap-4 border-b border-purple-500/20 bg-[#1E1B2E]/80 backdrop-blur-sm px-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              {sidebarOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </Button>
-            <DashboardHeader />
-          </div>
+          <DashboardHeader />
         </div>
 
         {/* Main Content */}
-        <main className="p-8">
+        <main className="p-8 pt-24">
           {children}
         </main>
       </div>

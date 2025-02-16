@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { TokenListingService } from '@/lib/services/token-listing-service'
 import { TokenManagementService } from '@/lib/services/token-management-service'
 import { toast } from 'react-hot-toast'
+import Link from 'next/link'
 
 type TokenInfo = {
   mint: string
@@ -48,9 +49,9 @@ export default function TokensPage() {
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">My Tokens</h1>
-        <Button onClick={() => window.location.href = '/dashboard/create'}>
-          Create New Token
-        </Button>
+        <Link href="/dashboard/tokens/create">
+          <Button>Create New Token</Button>
+        </Link>
       </div>
 
       {loading ? (
@@ -59,12 +60,11 @@ export default function TokensPage() {
         <Card className="bg-[#1E1B2E] border-purple-500/20">
           <CardContent className="text-center py-8">
             <p>You haven&apos;t created any tokens yet.</p>
-            <Button 
-              className="mt-4"
-              onClick={() => window.location.href = '/dashboard/create'}
-            >
-              Create Your First Token
-            </Button>
+            <Link href="/dashboard/tokens/create">
+              <Button className="mt-4">
+                Create Your First Token
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       ) : (
@@ -97,19 +97,12 @@ export default function TokensPage() {
                     </div>
                   )}
                   <div className="flex gap-2 mt-4">
-                    <Button 
-                      className="flex-1"
-                      onClick={() => window.location.href = `/token/${token.mint}`}
-                    >
-                      View
-                    </Button>
-                    <Button 
-                      className="flex-1"
-                      variant="outline"
-                      onClick={() => window.location.href = `/trade/${token.mint}`}
-                    >
-                      Trade
-                    </Button>
+                    <Link href={`/token/${token.mint}`}>
+                      <Button className="flex-1">View</Button>
+                    </Link>
+                    <Link href={`/dashboard/tokens/${token.mint}/trade`}>
+                      <Button className="flex-1" variant="outline">Trade</Button>
+                    </Link>
                   </div>
                 </div>
               </CardContent>
