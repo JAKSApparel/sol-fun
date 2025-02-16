@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Zap, Shield, BarChart3, Copy, Construction, X } from 'lucide-react'
 import { Button } from '../ui/button'
-import { TradingInterface } from '../trading-interface'
+import { TradingInterface } from '../trading/trading-interface'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 

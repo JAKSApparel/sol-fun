@@ -15,6 +15,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'SolCrusher',
   description: 'Revolutionizing NFT & Token Trading on Solana',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 const links: { label: string; path: string }[] = [
@@ -26,10 +29,7 @@ const links: { label: string; path: string }[] = [
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </head>
+      <head />
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
