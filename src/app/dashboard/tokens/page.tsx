@@ -8,6 +8,8 @@ import { TokenListingService } from '@/lib/services/token-listing-service'
 import { TokenManagementService } from '@/lib/services/token-management-service'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
+import { Input } from "@/components/ui/input"
+import { Search, Plus } from "lucide-react"
 
 type TokenInfo = {
   mint: string
@@ -46,70 +48,33 @@ export default function TokensPage() {
   }, [publicKey, connection])
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Tokens</h1>
+    <div className="container max-w-7xl mx-auto py-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <div className="flex-1 max-w-md">
+          <div className="relative">
+            <Input
+              placeholder="Search tokens..."
+              className="pl-10"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          </div>
+        </div>
         <Link href="/dashboard/tokens/create">
-          <Button>Create New Token</Button>
+          <Button className="bg-gradient-to-r from-[#9945FF] to-[#14F195]">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Token
+          </Button>
         </Link>
       </div>
 
-      {loading ? (
-        <div className="text-center py-8">Loading...</div>
-      ) : tokens.length === 0 ? (
-        <Card className="bg-[#1E1B2E] border-purple-500/20">
-          <CardContent className="text-center py-8">
-            <p>You haven&apos;t created any tokens yet.</p>
-            <Link href="/dashboard/tokens/create">
-              <Button className="mt-4">
-                Create Your First Token
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {tokens.map((token) => (
-            <Card 
-              key={token.mint}
-              className="bg-[#1E1B2E] border-purple-500/20"
-            >
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  <span>{token.name}</span>
-                  <span className="text-sm text-gray-400">{token.symbol}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Supply:</span>
-                    <span>{token.supply.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Holders:</span>
-                    <span>{token.holders}</span>
-                  </div>
-                  {token.price && (
-                    <div className="flex justify-between">
-                      <span>Price:</span>
-                      <span>${token.price.toFixed(6)}</span>
-                    </div>
-                  )}
-                  <div className="flex gap-2 mt-4">
-                    <Link href={`/token/${token.mint}`}>
-                      <Button className="flex-1">View</Button>
-                    </Link>
-                    <Link href={`/dashboard/tokens/${token.mint}/trade`}>
-                      <Button className="flex-1" variant="outline">Trade</Button>
-                    </Link>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Token cards that link to the dashboard */}
+        <Link href="/dashboard/tokens/address-here">
+          <Card className="p-4 bg-[#1E1B2E] border-purple-500/20 hover:border-purple-500/40 transition-colors">
+            {/* Token card content */}
+          </Card>
+        </Link>
+      </div>
     </div>
   )
 } 
