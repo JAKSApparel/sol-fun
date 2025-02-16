@@ -8,86 +8,59 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { useWallet } from '@solana/wallet-adapter-react'
+import { TokenChartDashboard } from "@/components/trading/token-chart-dashboard"
+import { PortfolioOverview } from "@/components/dashboard/portfolio-overview"
+import { PortfolioChart } from "@/components/dashboard/portfolio-chart"
+import { RecentActivity } from "@/components/dashboard/recent-activity"
 
 export default function DashboardPage() {
+  const { publicKey } = useWallet()
+
   return (
-    <div className="space-y-6 pt-4">
-      <Tabs defaultValue="tokens" className="w-full">
-        <TabsList className="bg-[#1E1B2E] border-purple-500/20">
-          <TabsTrigger 
-            value="tokens"
-            className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-white"
-          >
-            Tokens
-          </TabsTrigger>
-          <TabsTrigger 
-            value="nfts"
-            className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-white"
-          >
-            NFTs
-          </TabsTrigger>
-        </TabsList>
+    <div className="container max-w-7xl mx-auto py-6 space-y-6">
+      {/* Portfolio Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="p-4 bg-[#1E1B2E] border-purple-500/20">
+          <div className="text-sm text-gray-400">Portfolio Value</div>
+          <div className="text-2xl font-bold">$0.00</div>
+          <div className="text-xs text-green-500">+0.00%</div>
+        </Card>
+        <Card className="p-4 bg-[#1E1B2E] border-purple-500/20">
+          <div className="text-sm text-gray-400">24h Change</div>
+          <div className="text-2xl font-bold text-green-500">+$0.00</div>
+          <div className="text-xs text-green-500">+0.00%</div>
+        </Card>
+        <Card className="p-4 bg-[#1E1B2E] border-purple-500/20">
+          <div className="text-sm text-gray-400">Total Assets</div>
+          <div className="text-2xl font-bold">15</div>
+          <div className="text-xs text-gray-400">Tokens: 10 | NFTs: 5</div>
+        </Card>
+        <Card className="p-4 bg-[#1E1B2E] border-purple-500/20">
+          <div className="text-sm text-gray-400">SOL Balance</div>
+          <div className="text-2xl font-bold">0.00 SOL</div>
+          <div className="text-xs text-gray-400">≈ $0.00</div>
+        </Card>
+      </div>
 
-        <TabsContent value="tokens" className="mt-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="p-6 bg-[#1E1B2E] border-purple-500/20">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <Coins className="w-12 h-12 text-[#14F195]" />
-                <h3 className="text-xl font-semibold">Launch New Token</h3>
-                <p className="text-gray-400">Create and launch your own SPL token with custom tokenomics</p>
-                <Link href="/dashboard/tokens/create">
-                  <Button className="bg-[#14F195] text-black hover:bg-[#14F195]/90">
-                    Create Token
-                  </Button>
-                </Link>
-              </div>
-            </Card>
+      {/* Portfolio Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2 p-6 bg-[#1E1B2E] border-purple-500/20">
+          <h2 className="text-lg font-semibold mb-4">Portfolio Performance</h2>
+          <PortfolioChart />
+        </Card>
+        
+        <Card className="p-6 bg-[#1E1B2E] border-purple-500/20">
+          <h2 className="text-lg font-semibold mb-4">Portfolio Breakdown</h2>
+          <PortfolioOverview />
+        </Card>
+      </div>
 
-            <Card className="p-6 bg-[#1E1B2E] border-purple-500/20">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <Coins className="w-12 h-12 text-purple-500" />
-                <h3 className="text-xl font-semibold">My Tokens</h3>
-                <p className="text-gray-400">View and manage your created tokens</p>
-                <Link href="/dashboard/tokens">
-                  <Button variant="outline" className="border-purple-500/20">
-                    View Tokens
-                  </Button>
-                </Link>
-              </div>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="nfts" className="mt-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="p-6 bg-[#1E1B2E] border-purple-500/20">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <ImageIcon className="w-12 h-12 text-[#14F195]" />
-                <h3 className="text-xl font-semibold">Create NFT Collection</h3>
-                <p className="text-gray-400">Launch your own NFT collection with custom attributes</p>
-                <Link href="/dashboard/nfts/create">
-                  <Button className="bg-[#14F195] text-black hover:bg-[#14F195]/90">
-                    Create Collection
-                  </Button>
-                </Link>
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-[#1E1B2E] border-purple-500/20">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <ImageIcon className="w-12 h-12 text-purple-500" />
-                <h3 className="text-xl font-semibold">My NFTs</h3>
-                <p className="text-gray-400">View and manage your NFT collections</p>
-                <Link href="/dashboard/nfts">
-                  <Button variant="outline" className="border-purple-500/20">
-                    View Collections
-                  </Button>
-                </Link>
-              </div>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+      {/* Recent Activity */}
+      <Card className="p-6 bg-[#1E1B2E] border-purple-500/20">
+        <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
+        <RecentActivity />
+      </Card>
     </div>
   )
 }
