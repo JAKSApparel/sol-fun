@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import {ClusterProvider} from '@/components/cluster/cluster-data-access'
-import {SolanaProvider} from '@/components/solana/solana-provider'
-import {UiLayout} from '@/components/ui/ui-layout'
-import {ReactQueryProvider} from './react-query-provider'
+import { ClusterProvider } from '@/components/cluster/cluster-data-access'
+import { SolanaProvider } from '@/components/solana/solana-provider'
+import { ReactQueryProvider } from './react-query-provider'
 import { SolanaConnectionGuard } from '@/components/solana/solana-connection'
-import { Header } from '@/components/layout/header'
+import '@/lib/polyfills'
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,24 +24,29 @@ const links: { label: string; path: string }[] = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={inter.className}>
-        <ReactQueryProvider>
-          <ClusterProvider>
-            <SolanaProvider>
-              <UiLayout>
-                <Header />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ReactQueryProvider>
+            <ClusterProvider>
+              <SolanaProvider>
                 <SolanaConnectionGuard>
                   {children}
                 </SolanaConnectionGuard>
-              </UiLayout>
-            </SolanaProvider>
-          </ClusterProvider>
-        </ReactQueryProvider>
+                <Toaster position="bottom-right" />
+              </SolanaProvider>
+            </ClusterProvider>
+          </ReactQueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

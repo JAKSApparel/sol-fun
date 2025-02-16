@@ -2,174 +2,173 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
+  LayoutDashboard,
+  Coins,
+  LineChart,
+  Wallet,
   BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
+  HelpCircle,
+  Settings,
 } from "lucide-react"
-
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
+import Image from "next/image"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
+const navigation = {
+  main: [
     {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      title: "Overview",
+      icon: LayoutDashboard,
+      href: "/dashboard",
     },
     {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      title: "Tokens",
+      icon: Coins,
+      href: "/dashboard/tokens",
       items: [
+        {
+          title: "My Tokens",
+          href: "/dashboard/tokens",
+        },
+        {
+          title: "Create Token",
+          href: "/dashboard/tokens/create",
+        },
+      ],
+    },
+    {
+      title: "Trading",
+      icon: LineChart,
+      href: "/dashboard/trading",
+      items: [
+        {
+          title: "Trade",
+          href: "/dashboard/trading",
+        },
         {
           title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
+          href: "/dashboard/trading/history",
         },
       ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
+      title: "Wallet",
+      icon: Wallet,
+      href: "/dashboard/wallet",
     },
   ],
-  projects: [
+  resources: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      title: "Documentation",
+      icon: BookOpen,
+      href: "https://docs.solcrushers.com",
+      external: true,
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      title: "Support",
+      icon: HelpCircle,
+      href: "https://support.solcrushers.com",
+      external: true,
     },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar() {
+  const pathname = usePathname()
+  const { isMobile } = useSidebar()
+
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+    <Sidebar className="border-r border-purple-500/20">
+      <SidebarHeader className="border-b border-purple-500/20 h-16">
+        <Link href="/dashboard" className="flex items-center gap-2 px-4">
+          <Image 
+            src="/logo.png" 
+            alt="Logo" 
+            width={32} 
+            height={32}
+            className="w-8 h-8"
+          />
+          {!isMobile && <span className="font-semibold text-white">SolCrusher</span>}
+        </Link>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <nav className="space-y-6 px-4 py-6">
+          {/* Main Navigation */}
+          <div className="space-y-1">
+            {navigation.main.map((item) => (
+              <NavItem 
+                key={item.href}
+                item={item}
+                isActive={pathname === item.href}
+              />
+            ))}
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h4 className="text-xs font-semibold text-muted-foreground mb-2 px-3">RESOURCES</h4>
+            <div className="space-y-1">
+              {navigation.resources.map((item) => (
+                <NavItem 
+                  key={item.href}
+                  item={item}
+                  isActive={pathname === item.href}
+                />
+              ))}
+            </div>
+          </div>
+        </nav>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <nav className="px-4 py-3 border-t border-purple-500/20">
+          <NavItem 
+            item={{
+              title: "Settings",
+              icon: Settings,
+              href: "/dashboard/settings",
+            }}
+            isActive={pathname === "/dashboard/settings"}
+          />
+        </nav>
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
+  )
+}
+
+type NavItemProps = {
+  item: {
+    title: string
+    icon: React.ComponentType<{ className?: string }>
+    href: string
+    external?: boolean
+  }
+  isActive: boolean
+}
+
+function NavItem({ item, isActive }: NavItemProps) {
+  const { isMobile } = useSidebar()
+  const LinkComponent = item.external ? 'a' : Link
+  const linkProps = item.external ? { target: "_blank", rel: "noopener noreferrer" } : {}
+
+  return (
+    <LinkComponent
+      href={item.href}
+      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+        isActive 
+          ? 'bg-purple-500/20 text-white' 
+          : 'text-muted-foreground hover:bg-purple-500/10 hover:text-white'
+      }`}
+      {...linkProps}
+    >
+      <item.icon className="w-4 h-4" />
+      {!isMobile && <span>{item.title}</span>}
+    </LinkComponent>
   )
 }

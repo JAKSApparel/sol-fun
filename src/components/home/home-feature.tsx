@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Zap, Shield, BarChart3, Copy, Construction, X } from 'lucide-react'
 import { Button } from '../ui/button'
-import { TradingInterface } from '../trading-interface'
+import { TradingInterface } from '../trading/trading-interface'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 
@@ -176,103 +176,89 @@ function DevelopmentNotice() {
 
 export default function HomeFeature() {
   return (
-    <div className="min-h-screen bg-[#13111C] text-white">
-      {/* Hero Section with Trading Interface */}
-      <section className="pt-24 pb-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="lg:sticky lg:top-24"
-            >
-              <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#14F195]/10 rounded-full border border-[#14F195]/20">
-                  <Image 
-                    src="/sol.svg"
-                    alt="Solana Logo"
-                    width={16}
-                    height={16}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-[#14F195]">Powered by Solana</span>
-                </div>
-                <h1 className="text-5xl font-bold space-y-2">
-                  <span className="block">Trade Smarter.</span>
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#9945FF] to-[#14F195]">
-                    Trade Safer.
-                  </span>
-                </h1>
-                <p className="text-lg text-gray-400">
-                  Advanced trading tools and real-time analytics for serious Solana traders.
-                  Built for speed, security, and precision.
-                </p>
-                <div className="flex gap-4">
-                  <Button className="bg-[#14F195] hover:bg-[#14F195]/90 text-black">
+    <div className="min-h-screen bg-[#13111C] pt-16">
+      {/* Hero Section */}
+      <section className="relative">
+        <div className="container mx-auto px-4 pt-20 pb-16 sm:px-6 lg:px-8 lg:pt-32">
+          <div className="flex flex-col lg:flex-row justify-between gap-8">
+            {/* Left side - Hero content */}
+            <div className="lg:w-1/2 lg:pt-12">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 mb-6 rounded-full bg-[#1E1B2E] border border-purple-500/20">
+                <span className="w-2 h-2 rounded-full bg-[#14F195]"></span>
+                <span className="text-sm">Powered by Solana</span>
+              </div>
+              
+              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6">
+                Trade Smarter.
+                <br />
+                <span className="text-purple-500">Trade Safer.</span>
+              </h1>
+              
+              <p className="text-xl text-gray-400 mb-8">
+                Advanced trading tools and real-time analytics for serious Solana traders.
+                Built for speed, security, and precision.
+              </p>
+
+              <div className="flex flex-wrap gap-4">
+                <Link href="/dashboard">
+                  <Button 
+                    size="lg" 
+                    className="bg-[#14F195] text-black hover:bg-[#14F195]/90"
+                  >
                     Launch App
                   </Button>
-                  <Button variant="outline" className="border-[#334155] text-white hover:bg-[#1E293B]">
-                    Documentation
+                </Link>
+                <Link href="/dashboard/tokens/create">
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="border-purple-500/20"
+                  >
+                    Create Token
                   </Button>
-                </div>
+                </Link>
               </div>
-            </motion.div>
+            </div>
 
-            {/* Trading Interface */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative lg:sticky lg:top-24"
-            >
+            {/* Right side - Trading Interface */}
+            <div className="lg:w-1/2">
               <TradingInterface />
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Key Features Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9945FF] to-[#14F195]">
-              Key Features
-            </span>
-          </h2>
+      {/* Features Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                title: "AI-Powered Market Intelligence",
-                description: "Advanced AI models analyze market trends, social sentiment, and historical data.",
-                icon: <BarChart3 className="w-6 h-6 text-[#9945FF]" />
+                icon: Zap,
+                title: 'Lightning Fast',
+                description: 'Execute trades instantly with our optimized trading engine',
               },
               {
-                title: "Automated Trading Strategies",
-                description: "Smart bots for automated market-making, sniping, and liquidity provision.",
-                icon: <Zap className="w-6 h-6 text-[#9945FF]" />
+                icon: Shield,
+                title: 'Secure Trading',
+                description: 'Advanced security measures to protect your assets',
               },
               {
-                title: "Rug Protection & Risk Management",
-                description: "On-chain detection tools to flag suspicious projects before investing.",
-                icon: <Shield className="w-6 h-6 text-[#9945FF]" />
-              }
+                icon: BarChart3,
+                title: 'Real-time Analytics',
+                description: 'Make informed decisions with live market data',
+              },
             ].map((feature, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2 }}
-                className="group relative bg-[#1E1B2E] rounded-lg p-6 border border-purple-500/20 hover:border-purple-500/50 transition-all overflow-hidden"
+                className="p-6 rounded-lg bg-[#1E1B2E] border border-purple-500/20"
               >
-                {/* Gradient background that shows on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                
-                <div className="relative z-10">
-                  <div className="mb-4">{feature.icon}</div>
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-gray-400">{feature.description}</p>
-                </div>
+                <feature.icon className="w-12 h-12 text-[#14F195] mb-4" />
+                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                <p className="text-gray-400">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -346,7 +332,7 @@ export default function HomeFeature() {
               {
                 phase: "Phase 1: MVP Development",
                 date: "Q2 2025",
-                items: ["AI trading bot integration", "Basic analytics dashboard", "NFT & token tracking module"]
+                items: ["Token Launch", "Basic analytics dashboard", "NFT & token tracking module"]
               },
               {
                 phase: "Phase 2: Feature Expansion",

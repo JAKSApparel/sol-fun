@@ -8,6 +8,11 @@ const nextConfig = {
         path: false,
         os: false,
         crypto: false,
+        stream: false,
+        http: false,
+        https: false,
+        zlib: false,
+        buffer: require.resolve('buffer/'),
       }
     }
     return config
