@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Upload } from 'lucide-react'
+import { Upload, X, Trash2 } from 'lucide-react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { toast } from 'react-hot-toast'
 import {
@@ -33,6 +33,11 @@ import { useCluster } from '@/components/cluster/cluster-data-access'
 import { Keypair } from '@solana/web3.js'
 import { createSignerFromWallet } from '@metaplex-foundation/umi-signer-wallet-adapters'
 
+type TokenMetadata = {
+  name: string
+  value: string
+}
+
 export default function CreateTokenPage() {
   const { publicKey, signTransaction, signMessage } = useWallet()
   const { connection } = useConnection()
@@ -48,11 +53,18 @@ export default function CreateTokenPage() {
     isBurnable: true,
     isFrozen: false,
     maxSupply: '',
+    metadata: [] as TokenMetadata[],
+    imagePreview: '',
   })
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({ ...prev, image: e.target.files![0] }))
+      const file = e.target.files[0]
+      setFormData(prev => ({ 
+        ...prev, 
+        image: file,
+        imagePreview: URL.createObjectURL(file)
+      }))
     }
   }
 
@@ -65,6 +77,29 @@ export default function CreateTokenPage() {
   const getFullSymbol = () => {
     const baseSymbol = formData.symbol.toUpperCase().replace(/CRUSH$/, '')
     return baseSymbol ? `${baseSymbol}CRUSH` : ''
+  }
+
+  const addMetadata = () => {
+    setFormData(prev => ({
+      ...prev,
+      metadata: [...prev.metadata, { name: '', value: '' }]
+    }))
+  }
+
+  const updateMetadata = (index: number, field: 'name' | 'value', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      metadata: prev.metadata.map((item, i) => 
+        i === index ? { ...item, [field]: value } : item
+      )
+    }))
+  }
+
+  const removeMetadata = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      metadata: prev.metadata.filter((_, i) => i !== index)
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,7 +143,7 @@ export default function CreateTokenPage() {
         imageUri = uploadedImage
       }
 
-      // Create and upload metadata
+      // Create and upload metadata with additional properties
       const metadata = {
         name: formData.name,
         symbol: getFullSymbol(),
@@ -118,6 +153,10 @@ export default function CreateTokenPage() {
           { trait_type: 'Burnable', value: formData.isBurnable ? 'Yes' : 'No' },
           { trait_type: 'Initial Supply', value: formData.supply },
           { trait_type: 'Max Supply', value: formData.maxSupply || 'Unlimited' },
+          ...formData.metadata.map(({ name, value }) => ({
+            trait_type: name,
+            value
+          }))
         ],
       }
 
@@ -233,10 +272,36 @@ export default function CreateTokenPage() {
                 htmlFor="image-upload"
                 className="flex flex-col items-center justify-center cursor-pointer"
               >
-                <Upload className="w-8 h-8 text-purple-500 mb-2" />
-                <span className="text-sm text-gray-400">
-                  {formData.image ? formData.image.name : 'Click to upload token logo'}
-                </span>
+                {formData.imagePreview ? (
+                  <div className="relative w-32 h-32 mb-2">
+                    <img
+                      src={formData.imagePreview}
+                      alt="Token logo preview"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setFormData(prev => ({
+                          ...prev,
+                          image: null,
+                          imagePreview: ''
+                        }))
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
+                    >
+                      <X className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="w-8 h-8 text-purple-500 mb-2" />
+                    <span className="text-sm text-gray-400">
+                      Click to upload token logo
+                    </span>
+                  </>
+                )}
               </label>
             </div>
           </div>
@@ -299,6 +364,48 @@ export default function CreateTokenPage() {
               value={formData.maxSupply}
               onChange={e => setFormData(prev => ({ ...prev, maxSupply: e.target.value }))}
             />
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label>Additional Metadata</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addMetadata}
+                className="border-purple-500/20 hover:bg-purple-500/10"
+              >
+                Add Field
+              </Button>
+            </div>
+
+            {formData.metadata.map((field, index) => (
+              <div key={index} className="flex gap-4 items-start">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Trait name"
+                    value={field.name}
+                    onChange={(e) => updateMetadata(index, 'name', e.target.value)}
+                    className="mb-2"
+                  />
+                  <Input
+                    placeholder="Trait value"
+                    value={field.value}
+                    onChange={(e) => updateMetadata(index, 'value', e.target.value)}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeMetadata(index)}
+                  className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
           </div>
 
           <Button
