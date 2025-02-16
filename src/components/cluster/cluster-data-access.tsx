@@ -1,123 +1,65 @@
 'use client'
 
-import { clusterApiUrl, Connection } from '@solana/web3.js'
-import { atom, useAtomValue, useSetAtom } from 'jotai'
-import { atomWithStorage } from 'jotai/utils'
-import { createContext, ReactNode, useContext } from 'react'
-import toast from 'react-hot-toast'
+import { createContext, useContext, useState, type ReactNode } from 'react'
+import { type Cluster, clusterApiUrl } from '@solana/web3.js'
 
-export interface Cluster {
+export type ClusterNetwork = Cluster | 'localnet'
+
+export interface ClusterInfo {
   name: string
   endpoint: string
-  network?: ClusterNetwork
-  active?: boolean
+  network: ClusterNetwork
 }
 
-export enum ClusterNetwork {
-  Mainnet = 'mainnet-beta',
-  Testnet = 'testnet',
-  Devnet = 'devnet',
-  Custom = 'custom',
-}
-
-// Update the default clusters to prioritize devnet
-export const defaultClusters: Cluster[] = [
+const CLUSTERS: ClusterInfo[] = [
   {
     name: 'Devnet',
-    endpoint: 'https://api.devnet.solana.com',
-    network: ClusterNetwork.Devnet,
-  },
-  {
-    name: 'Mainnet',
-    endpoint: 'https://api.mainnet-beta.solana.com',
-    network: ClusterNetwork.Mainnet,
+    endpoint: clusterApiUrl('devnet'),
+    network: 'devnet',
   },
   {
     name: 'Testnet',
     endpoint: clusterApiUrl('testnet'),
-    network: ClusterNetwork.Testnet,
+    network: 'testnet',
   },
   {
-    name: 'Localhost',
+    name: 'Mainnet Beta',
+    endpoint: clusterApiUrl('mainnet-beta'),
+    network: 'mainnet-beta',
+  },
+  {
+    name: 'Localnet',
     endpoint: 'http://localhost:8899',
+    network: 'localnet',
   },
 ]
 
-const clusterAtom = atomWithStorage<Cluster>('solana-cluster', defaultClusters[0])
-const clustersAtom = atomWithStorage<Cluster[]>('solana-clusters', defaultClusters)
+const DEFAULT_CLUSTER = CLUSTERS[0]
 
-const activeClustersAtom = atom<Cluster[]>((get) => {
-  const clusters = get(clustersAtom)
-  const cluster = get(clusterAtom)
-  return clusters.map((item) => ({
-    ...item,
-    active: item.name === cluster.name,
-  }))
-})
-
-const activeClusterAtom = atom<Cluster>((get) => {
-  const clusters = get(activeClustersAtom)
-
-  return clusters.find((item) => item.active) || clusters[0]
-})
-
-export interface ClusterProviderContext {
-  cluster: Cluster
-  clusters: Cluster[]
-  addCluster: (cluster: Cluster) => void
-  deleteCluster: (cluster: Cluster) => void
-  setCluster: (cluster: Cluster) => void
-  getExplorerUrl(path: string): string
+type ClusterContextState = {
+  cluster: ClusterInfo
+  setCluster: (cluster: ClusterInfo) => void
+  clusters: ClusterInfo[]
 }
 
-const Context = createContext<ClusterProviderContext>({} as ClusterProviderContext)
+const ClusterContext = createContext<ClusterContextState>({} as ClusterContextState)
 
 export function ClusterProvider({ children }: { children: ReactNode }) {
-  const cluster = useAtomValue(activeClusterAtom)
-  const clusters = useAtomValue(activeClustersAtom)
-  const setCluster = useSetAtom(clusterAtom)
-  const setClusters = useSetAtom(clustersAtom)
+  const [cluster, setCluster] = useState<ClusterInfo>(DEFAULT_CLUSTER)
 
-  const value: ClusterProviderContext = {
-    cluster,
-    clusters: clusters.sort((a, b) => (a.name > b.name ? 1 : -1)),
-    addCluster: (cluster: Cluster) => {
-      try {
-        new Connection(cluster.endpoint)
-        setClusters([...clusters, cluster])
-      } catch (err) {
-        toast.error(`${err}`)
-      }
-    },
-    deleteCluster: (cluster: Cluster) => {
-      setClusters(clusters.filter((item) => item.name !== cluster.name))
-    },
-    setCluster: (cluster: Cluster) => setCluster(cluster),
-    getExplorerUrl: (path: string) => `https://explorer.solana.com/${path}${getClusterUrlParam(cluster)}`,
-  }
-  return <Context.Provider value={value}>{children}</Context.Provider>
+  return (
+    <ClusterContext.Provider
+      value={{
+        cluster,
+        setCluster,
+        clusters: CLUSTERS,
+      }}
+    >
+      {children}
+    </ClusterContext.Provider>
+  )
 }
 
 export function useCluster() {
-  return useContext(Context)
-}
-
-function getClusterUrlParam(cluster: Cluster): string {
-  let suffix = ''
-  switch (cluster.network) {
-    case ClusterNetwork.Devnet:
-      suffix = 'devnet'
-      break
-    case ClusterNetwork.Mainnet:
-      suffix = ''
-      break
-    case ClusterNetwork.Testnet:
-      suffix = 'testnet'
-      break
-    default:
-      suffix = `custom&customUrl=${encodeURIComponent(cluster.endpoint)}`
-      break
-  }
-
-  return suffix.length ? `?cluster=${suffix}` : ''
+  return useContext(ClusterContext)
 }

@@ -6,19 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { TokenSelectDialog } from "./token-select-dialog"
-
-export type Token = {
-  id: string
-  symbol: string
-  name: string
-  balance?: string
-}
-
-const tokens: Token[] = [
-  { id: "1", symbol: "USDC", name: "USD Coin" },
-  { id: "2", symbol: "SOL", name: "Solana" },
-  { id: "3", symbol: "BONK", name: "Bonk" },
-]
+import { tokens, type Token } from "@/token-list"
 
 export function TradingInterface() {
   const [sellToken, setSellToken] = useState<Token>(tokens[0])

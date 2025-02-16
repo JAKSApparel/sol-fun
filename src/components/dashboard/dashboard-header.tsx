@@ -16,6 +16,7 @@ import { useState, useEffect } from 'react'
 import { NetworkSelector } from '../solana/network-selector'
 import { useCluster } from '../cluster/cluster-data-access'
 import { ThemeToggle } from "@/components/theme-toggle"
+import { NetworkSwitcher } from "../cluster/network-switcher"
 
 function DesktopHeader({ balance }: { balance: number | null }) {
   return (
@@ -33,7 +34,7 @@ function DesktopHeader({ balance }: { balance: number | null }) {
 
       <div className="flex items-center gap-4 ml-4">
         <ThemeToggle />
-        <NetworkSelector />
+        <NetworkSwitcher />
         {balance !== null && (
           <Button variant="ghost" className="flex items-center gap-2 px-4 py-2 bg-background/50 rounded-full border border-border">
             <Image 
