@@ -33,14 +33,25 @@ type TokenMetadata = {
   value: string
 }
 
+type FormData = {
+  name: string
+  symbol: string
+  description: string
+  supply: string
+  decimals: string
+  metadata: TokenMetadata[]
+  image?: File
+  imagePreview?: string
+}
+
 export default function CreateTokenPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     symbol: '',
     description: '',
     supply: '',
     decimals: '9',
-    metadata: [] as TokenMetadata[],
+    metadata: [],
   })
   const [isCreating, setIsCreating] = useState(false)
   const [metadataUri, setMetadataUri] = useState('')
@@ -55,10 +66,11 @@ export default function CreateTokenPage() {
     setIsCreating(true)
     try {
       const mint = generateSigner(umi)
+      const authority = umi.identity // Use the UMI identity instead of converting publicKey
 
       const builder = createMintWithAssociatedToken(umi, {
         mint,
-        owner: toPublicKey(publicKey.toBase58()),
+        owner: authority.publicKey,
         decimals: Number(formData.decimals),
         amount: BigInt(formData.supply),
       })
@@ -68,12 +80,11 @@ export default function CreateTokenPage() {
       builder.add(createMetadataAccountV3(umi, {
         metadata: metadataPda,
         mint: mint.publicKey,
-        mintAuthority: toPublicKey(publicKey.toBase58()),
-        updateAuthority: toPublicKey(publicKey.toBase58()),
+        authority: authority.publicKey,
         data: {
           name: formData.name,
           symbol: formData.symbol,
-          uri: 'https://arweave.net/your-metadata-uri', // Replace with actual metadata URI
+          uri: 'https://arweave.net/your-metadata-uri',
           sellerFeeBasisPoints: 0,
           creators: null,
           collection: null,

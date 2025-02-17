@@ -8,5 +8,8 @@
         "buildCommand": "npm run build"
       }
     }
-  ]
+  ],
+  "env": {
+    "NEXT_PUBLIC_HELIUS_API_KEY": "@helius_api_key"
+  }
 } 

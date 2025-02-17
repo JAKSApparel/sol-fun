@@ -1,14 +1,35 @@
 'use client'
 
+import { createContext, useContext, useState, type ReactNode } from 'react'
+import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
+import { getProgram } from '@/lib/anchor'
 import { getSolcrusherfunProgram, getSolcrusherfunProgramId } from '@project/anchor'
-import { useConnection } from '@solana/wallet-adapter-react'
-import { Cluster, Keypair, PublicKey } from '@solana/web3.js'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import toast from 'react-hot-toast'
 import { useCluster } from '../cluster/cluster-data-access'
 import { useAnchorProvider } from '../solana/solana-provider'
 import { useTransactionToast } from '../ui/ui-layout'
+
+const SolCrusherFunContext = createContext<any>(null)
+
+export function SolCrusherFunProvider({ children }: { children: ReactNode }) {
+  const { connection } = useConnection()
+  const wallet = useAnchorWallet()
+  const program = getProgram(connection, wallet)
+
+  return (
+    <SolCrusherFunContext.Provider value={{ program }}>
+      {children}
+    </SolCrusherFunContext.Provider>
+  )
+}
+
+export function useSolCrusherFun() {
+  const context = useContext(SolCrusherFunContext)
+  if (!context) throw new Error('useSolCrusherFun must be used within SolCrusherFunProvider')
+  return context
+}
 
 export function useSolcrusherfunProgram() {
   const { connection } = useConnection()
