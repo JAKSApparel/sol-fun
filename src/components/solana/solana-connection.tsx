@@ -11,7 +11,7 @@ export function SolanaConnectionGuard({ children }: { children: React.ReactNode 
   const { cluster } = useCluster()
   const [isConnected, setIsConnected] = useState(true)
 
-  const checkConnection = useCallback(() => {
+  const checkConnection = useCallback(async () => {
     try {
       await connection.getVersion()
       setIsConnected(true)
@@ -21,7 +21,7 @@ export function SolanaConnectionGuard({ children }: { children: React.ReactNode 
   }, [connection])
 
   useEffect(() => {
-    checkConnection()
+    checkConnection().catch(console.error)
   }, [checkConnection])
 
   if (!isConnected) {
