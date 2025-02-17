@@ -34,6 +34,9 @@ const nextConfig = {
     '@solana/web3.js',
     '@project-serum/serum',
     '@solana/spl-token',
+    '@metaplex-foundation/mpl-token-metadata',
+    '@metaplex-foundation/mpl-toolbox',
+    '@metaplex-foundation/umi'
   ],
 }
 

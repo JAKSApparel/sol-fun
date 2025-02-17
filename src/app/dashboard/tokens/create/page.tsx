@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Upload, X, Trash2 } from 'lucide-react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { toast } from 'react-hot-toast'
+import { useToast } from "@/components/ui/use-toast"
 import {
   createMetadataAccountV3,
   findMetadataPda,
@@ -47,6 +47,9 @@ type FormData = {
 }
 
 export default function CreateTokenPage() {
+  const { toast } = useToast()
+  const { publicKey: walletPublicKey } = useWallet()
+  const [isCreating, setIsCreating] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     name: '',
     symbol: '',
@@ -55,21 +58,27 @@ export default function CreateTokenPage() {
     decimals: '9',
     metadata: [],
   })
-  const [isCreating, setIsCreating] = useState(false)
   const [metadataUri, setMetadataUri] = useState('')
-  const { publicKey } = useWallet()
   const router = useRouter()
   const umi = useUmi()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!umi) {
-      toast.error('UMI provider not initialized')
+      toast({
+        title: "Error",
+        description: "UMI provider not initialized",
+        variant: "destructive"
+      })
       return
     }
     
-    if (!publicKey) {
-      toast.error('Please connect your wallet')
+    if (!walletPublicKey) {
+      toast({
+        title: "Error",
+        description: "Please connect your wallet first",
+        variant: "destructive"
+      })
       return
     }
 
@@ -107,11 +116,18 @@ export default function CreateTokenPage() {
 
       const { signature } = await builder.sendAndConfirm(umi)
       
-      toast.success('Token created successfully!')
+      toast({
+        title: "Success",
+        description: "Token created successfully!",
+      })
       router.push(`/dashboard/tokens/${base58.serialize(mint.publicKey)}`)
     } catch (error) {
       console.error('Error creating token:', error)
-      toast.error('Failed to create token')
+      toast({
+        title: "Error",
+        description: "Failed to create token",
+        variant: "destructive"
+      })
     } finally {
       setIsCreating(false)
     }
