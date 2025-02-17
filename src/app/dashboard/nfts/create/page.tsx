@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Upload } from 'lucide-react'
-import { useWallet } from '@solana/wallet-adapter-react-ui'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { toast } from 'react-hot-toast'
 
 export default function CreateNFTPage() {
