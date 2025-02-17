@@ -10,28 +10,32 @@ import { Upload, X, Trash2 } from 'lucide-react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { toast } from 'react-hot-toast'
 import {
-  createFungible,
-  mplTokenMetadata,
+  createMetadataAccountV3,
+  PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
+  findMetadataPda,
 } from '@metaplex-foundation/mpl-token-metadata'
 import {
-  createTokenIfMissing,
+  createMint,
+  createMintWithAssociatedToken,
   findAssociatedTokenPda,
-  getSplAssociatedTokenProgramId,
-  mintTokensTo,
+  TokenWithMint,
+  mplToolbox,
 } from '@metaplex-foundation/mpl-toolbox'
 import {
   generateSigner,
   percentAmount,
-  createGenericFile,
-  signerIdentity,
-  keypairIdentity,
+  publicKey as toPublicKey,
+  Signer,
+  some,
 } from '@metaplex-foundation/umi'
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
 import { bundlrUploader } from '@metaplex-foundation/umi-uploader-bundlr'
 import { base58 } from '@metaplex-foundation/umi/serializers'
 import { useCluster } from '@/components/cluster/cluster-data-access'
 import { Keypair } from '@solana/web3.js'
-import { createSignerFromWallet } from '@metaplex-foundation/umi-signer-wallet-adapters'
+import { createSignerFromWalletAdapter } from '@metaplex-foundation/umi-signer-wallet-adapters'
+import { useRouter } from 'next/navigation'
+import { useUmi } from '@/components/umi/umi-provider'
 
 type TokenMetadata = {
   name: string
@@ -39,8 +43,9 @@ type TokenMetadata = {
 }
 
 export default function CreateTokenPage() {
-  const { publicKey, signTransaction, signMessage } = useWallet()
-  const { connection } = useConnection()
+  const umi = useUmi()
+  const { publicKey } = useWallet()
+  const router = useRouter()
   const { cluster } = useCluster()
   const [isCreating, setIsCreating] = useState(false)
   const [formData, setFormData] = useState({
@@ -104,107 +109,44 @@ export default function CreateTokenPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!publicKey || !signTransaction || !signMessage) {
-      toast.error('Please connect your wallet first')
-      return
-    }
+    if (!publicKey) return
     
+    setIsCreating(true)
     try {
-      setIsCreating(true)
-      
-      // Initialize Umi
-      const umi = createUmi(connection.rpcEndpoint)
-        .use(mplTokenMetadata())
-        .use(bundlrUploader())
+      const mint = generateSigner(umi)
 
-      // Create a wallet adapter signer
-      const walletAdapter = {
-        publicKey,
-        signTransaction,
-        signMessage,
-      }
-      const signer = createSignerFromWallet(walletAdapter)
-      umi.use(signerIdentity(signer))
-
-      // Generate a new mint keypair
-      const mintKeypair = Keypair.generate()
-      const mintPublicKey = mintKeypair.publicKey
-      
-      // Upload image if provided
-      let imageUri = ''
-      if (formData.image) {
-        const imageBuffer = await formData.image.arrayBuffer()
-        const umiImage = createGenericFile(
-          new Uint8Array(imageBuffer),
-          formData.image.name,
-          { contentType: formData.image.type }
-        )
-        const [uploadedImage] = await umi.uploader.upload([umiImage])
-        imageUri = uploadedImage
-      }
-
-      // Create and upload metadata with additional properties
-      const metadata = {
-        name: formData.name,
-        symbol: getFullSymbol(),
-        description: formData.description,
-        image: imageUri,
-        attributes: [
-          { trait_type: 'Burnable', value: formData.isBurnable ? 'Yes' : 'No' },
-          { trait_type: 'Initial Supply', value: formData.supply },
-          { trait_type: 'Max Supply', value: formData.maxSupply || 'Unlimited' },
-          ...formData.metadata.map(({ name, value }) => ({
-            trait_type: name,
-            value
-          }))
-        ],
-      }
-
-      const metadataUri = await umi.uploader.uploadJson(metadata)
-      
-      // Create the token
-      await createFungible(umi, {
-        mint: mintPublicKey,
-        name: formData.name,
-        symbol: getFullSymbol(),
-        uri: metadataUri,
-        sellerFeeBasisPoints: percentAmount(0),
+      const builder = createMintWithAssociatedToken(umi, {
+        mint,
+        owner: toPublicKey(publicKey.toBase58()),
         decimals: Number(formData.decimals),
-        authority: publicKey,
-        freezeAuthority: formData.isFrozen ? publicKey : null,
-      }).sendAndConfirm(umi)
-
-      // Mint initial supply
-      const supply = BigInt(Number(formData.supply) * Math.pow(10, Number(formData.decimals)))
-      
-      const tokenAccount = findAssociatedTokenPda(umi, {
-        mint: mintPublicKey,
-        owner: publicKey,
+        amount: BigInt(formData.supply),
       })
 
-      await mintTokensTo(umi, {
-        mint: mintPublicKey,
-        amount: supply,
-        token: tokenAccount,
-      }).sendAndConfirm(umi)
+      const metadataPda = findMetadataPda(umi, { mint: mint.publicKey })
+
+      builder.add(createMetadataAccountV3(umi, {
+        metadata: metadataPda,
+        mint: mint.publicKey,
+        authority: toPublicKey(publicKey.toBase58()),
+        data: {
+          name: formData.name,
+          symbol: getFullSymbol(),
+          uri: metadataUri,
+          sellerFeeBasisPoints: 0,
+          creators: null,
+          collection: null,
+          uses: null,
+        },
+        isMutable: true,
+        collectionDetails: null,
+      }))
+
+      const { signature } = await builder.sendAndConfirm(umi)
       
       toast.success('Token created successfully!')
-      toast.success(
-        <div>
-          View on Solana Explorer:
-          <a 
-            href={`https://explorer.solana.com/address/${mintPublicKey.toString()}?cluster=${cluster.network}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:text-blue-600 ml-1"
-          >
-            {mintPublicKey.toString().slice(0, 8)}...
-          </a>
-        </div>
-      )
-
+      router.push(`/dashboard/tokens/${base58.serialize(mint.publicKey)}`)
     } catch (error) {
-      console.error('Error creating token:', error)
+      console.error('Failed to create token:', error)
       toast.error('Failed to create token')
     } finally {
       setIsCreating(false)

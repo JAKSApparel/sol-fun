@@ -7,7 +7,12 @@ import { Copy, Zap, Bot, Shield, BarChart2 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 
-const CONTRACT_ADDRESS = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" // Contract address placeholder
+const CONTRACT_ADDRESS = "3GAXYKxpno85CSNnDGvHLYYiqdRF2Cz11g1VEhqgpump"
+
+const SOCIAL_LINKS = {
+  telegram: 'https://t.me/solcrushers',
+  twitter: 'https://twitter.com/solcrusher_'
+}
 
 export default function HomePage() {
   const copyAddress = () => {
@@ -21,50 +26,35 @@ export default function HomePage() {
       
       {/* Hero Section */}
       <div className="relative">
-        <div className="container mx-auto px-4 pt-20 pb-16 sm:px-6 lg:px-8 lg:pt-32">
-          <div className="flex flex-col lg:flex-row justify-between gap-8">
-            {/* Left side - Hero content */}
-            <div className="lg:w-1/2 lg:pt-12">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 mb-6 rounded-full bg-[#1E1B2E] border border-purple-500/20">
-                <span className="w-2 h-2 rounded-full bg-[#14F195]"></span>
-                <span className="text-sm text-white">Powered by Solana</span>
-              </div>
-              
-              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl mb-6">
-                Trade Smarter.
-                <br />
-                <span className="text-purple-500">Trade Safer.</span>
-              </h1>
-              
-              <p className="text-xl text-gray-400 mb-8">
-                Advanced trading tools and real-time analytics for serious Solana traders.
-                Built for speed, security, and precision.
-              </p>
-
-              <div className="flex flex-wrap gap-4">
-                <Link href="/dashboard">
-                  <Button 
-                    size="lg" 
-                    className="bg-[#14F195] text-black hover:bg-[#14F195]/90"
-                  >
-                    Launch App
-                  </Button>
-                </Link>
+        <div className="container mx-auto px-4 pt-32 pb-16">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-transparent bg-clip-text">
+              SolCrusher Token
+            </h1>
+            <p className="text-xl text-gray-400 mb-8">
+              The next generation of Solana trading
+            </p>
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <code className="px-4 py-2 rounded-lg bg-[#1E1B2E] border border-purple-500/20 font-mono text-sm">
+                {CONTRACT_ADDRESS}
+              </code>
+              <Button 
+                variant="outline" 
+                onClick={copyAddress}
+                className="border-purple-500/20 hover:bg-purple-500/10"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/dashboard">
                 <Button 
                   size="lg" 
-                  variant="outline"
-                  className="border-purple-500/20 text-white"
-                  onClick={copyAddress}
+                  className="bg-[#14F195] text-black hover:bg-[#14F195]/90"
                 >
-                  <Copy className="mr-2 h-4 w-4" />
-                  {CONTRACT_ADDRESS}
+                  Launch App
                 </Button>
-              </div>
-            </div>
-
-            {/* Right side - Trading Interface */}
-            <div className="lg:w-1/2">
-              <TradingInterface />
+              </Link>
             </div>
           </div>
         </div>
@@ -181,6 +171,40 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Community Section */}
+      <div className="py-16 bg-[#1E1B2E]">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Join the Community</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <a 
+              href={SOCIAL_LINKS.telegram} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center p-6 bg-[#13111C] rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-colors"
+            >
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold mb-2">Join us on Telegram</h3>
+                <p className="text-gray-400">@solcrushers</p>
+              </div>
+              {/* Your Telegram icon */}
+            </a>
+            
+            <a 
+              href={SOCIAL_LINKS.twitter} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center p-6 bg-[#13111C] rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-colors"
+            >
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold mb-2">Follow on X</h3>
+                <p className="text-gray-400">@solcrusher_</p>
+              </div>
+              {/* Your X/Twitter icon */}
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -2,29 +2,31 @@
 
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getAccount } from '@solana/spl-token'
-import { Metaplex } from '@metaplex-foundation/js'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { useUmi } from '@/components/umi/umi-provider'
+import { fetchMetadata } from '@metaplex-foundation/mpl-token-metadata'
+import { publicKey } from '@metaplex-foundation/umi'
 
 export class TokenListingService {
   private connection: Connection
-  private metaplex: Metaplex
+  private umi: ReturnType<typeof useUmi>
 
-  constructor(connection: Connection) {
+  constructor(connection: Connection, umi: ReturnType<typeof useUmi>) {
     this.connection = connection
-    this.metaplex = new Metaplex(connection)
+    this.umi = umi
   }
 
   async getTokenInfo(mintAddress: string) {
     try {
-      const mint = new PublicKey(mintAddress)
-      const metadata = await this.metaplex.nfts().findByMint({ mintAddress: mint })
+      const mint = publicKey(mintAddress)
+      const metadata = await fetchMetadata(this.umi, mint)
       
       return {
         mint: mintAddress,
         name: metadata.name,
         symbol: metadata.symbol,
         uri: metadata.uri,
-        metadata: metadata.address.toString(),
+        metadata: metadata.publicKey.toString(),
       }
     } catch (error) {
       console.error('Failed to get token info:', error)

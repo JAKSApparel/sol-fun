@@ -26,6 +26,7 @@ const nextConfig = {
         fullySpecified: false,
       },
     })
+    config.externals.push('encoding', 'pino-pretty', 'lokijs', 'node:crypto')
     return config
   },
   transpilePackages: [

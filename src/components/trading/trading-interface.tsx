@@ -7,8 +7,15 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { TokenSelectDialog } from "./token-select-dialog"
 import { tokens, type Token } from "@/token-list"
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { toast } from 'react-hot-toast'
+import { useUmi } from '@/components/umi/umi-provider'
+import { transferTokens } from '@metaplex-foundation/mpl-toolbox'
+import { publicKey } from '@metaplex-foundation/umi'
 
 export function TradingInterface() {
+  const umi = useUmi()
+  const { publicKey: walletKey } = useWallet()
   const [sellToken, setSellToken] = useState<Token>(tokens[0])
   const [buyToken, setBuyToken] = useState<Token>(tokens[1])
   const [sellDialogOpen, setSellDialogOpen] = useState(false)
@@ -18,6 +25,23 @@ export function TradingInterface() {
     const temp = sellToken
     setSellToken(buyToken)
     setBuyToken(temp)
+  }
+
+  const handleTrade = async () => {
+    if (!walletKey) return
+
+    try {
+      const { signature } = await transferTokens(umi, {
+        source: publicKey(sellToken.address),
+        destination: publicKey(buyToken.address),
+        amount: BigInt(1), // Replace with actual amount
+      }).sendAndConfirm(umi)
+
+      toast.success('Trade executed successfully!')
+    } catch (error) {
+      console.error('Trade failed:', error)
+      toast.error('Trade failed')
+    }
   }
 
   return (
