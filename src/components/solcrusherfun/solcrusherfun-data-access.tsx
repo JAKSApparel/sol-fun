@@ -1,17 +1,16 @@
 'use client'
 
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react'
-import { getProgram } from '@/lib/anchor'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { Cluster, PublicKey } from '@solana/web3.js'
-import toast from 'react-hot-toast'
+import { getProgram, type SolCrusherProgram } from '@/lib/anchor/program'
+import { useQuery } from '@tanstack/react-query'
+import { PublicKey } from '@solana/web3.js'
 import { useCluster } from '../cluster/cluster-data-access'
 import { useAnchorProvider } from '../solana/solana-provider'
 import { useTransactionToast } from '../ui/ui-layout'
 
 type SolCrusherFunContextType = {
-  program: ReturnType<typeof getProgram>
+  program: SolCrusherProgram | null
 }
 
 const SolCrusherFunContext = createContext<SolCrusherFunContextType | null>(null)

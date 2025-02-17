@@ -66,7 +66,7 @@ export default function CreateTokenPage() {
     setIsCreating(true)
     try {
       const mint = generateSigner(umi)
-      const authority = umi.identity // Use the UMI identity instead of converting publicKey
+      const authority = umi.identity
 
       const builder = createMintWithAssociatedToken(umi, {
         mint,
@@ -80,11 +80,12 @@ export default function CreateTokenPage() {
       builder.add(createMetadataAccountV3(umi, {
         metadata: metadataPda,
         mint: mint.publicKey,
-        authority: authority.publicKey,
+        mintAuthority: authority.publicKey,
+        updateAuthority: authority.publicKey,
         data: {
           name: formData.name,
           symbol: formData.symbol,
-          uri: 'https://arweave.net/your-metadata-uri',
+          uri: metadataUri,
           sellerFeeBasisPoints: 0,
           creators: null,
           collection: null,
@@ -148,6 +149,14 @@ export default function CreateTokenPage() {
     setFormData(prev => ({
       ...prev,
       metadata: prev.metadata.filter((_, i) => i !== index)
+    }))
+  }
+
+  const removeImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      image: undefined,
+      imagePreview: ''
     }))
   }
 
@@ -219,20 +228,13 @@ export default function CreateTokenPage() {
                       alt="Token logo preview"
                       className="w-full h-full object-cover rounded-lg"
                     />
-                    <button
+                    <Button
                       type="button"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setFormData(prev => ({
-                          ...prev,
-                          image: null,
-                          imagePreview: ''
-                        }))
-                      }}
+                      onClick={removeImage}
                       className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
                     >
                       <X className="w-4 h-4 text-white" />
-                    </button>
+                    </Button>
                   </div>
                 ) : (
                   <>
