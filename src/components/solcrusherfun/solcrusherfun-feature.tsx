@@ -7,32 +7,26 @@ import { ExplorerLink } from '../cluster/cluster-ui'
 import { useSolCrusherFun } from './solcrusherfun-data-access'
 import { SolcrusherfunCreate, SolcrusherfunList } from './solcrusherfun-ui'
 
-export default function SolcrusherfunFeature() {
-  const { publicKey } = useWallet()
+export function SolcrusherfunFeature() {
   const { program } = useSolCrusherFun()
+  
+  if (!program) return null
 
-  return publicKey ? (
+  return (
     <div>
       <AppHero
-        title="Solcrusherfun"
-        subtitle={
-          'Create a new account by clicking the "Create" button. The state of a account is stored on-chain and can be manipulated by calling the program\'s methods (increment, decrement, set, and close).'
-        }
+        title="SolCrusher Fun"
+        subtitle="A fun game on Solana"
       >
         <p className="mb-6">
-          <ExplorerLink path={`account/${program.programId}`} label={ellipsify(program.programId.toString())} />
+          <ExplorerLink 
+            path={`account/${program.programId}`} 
+            label={ellipsify(program.programId.toString())} 
+          />
         </p>
         <SolcrusherfunCreate />
       </AppHero>
       <SolcrusherfunList />
-    </div>
-  ) : (
-    <div className="max-w-4xl mx-auto">
-      <div className="hero py-[64px]">
-        <div className="hero-content text-center">
-          <WalletButton />
-        </div>
-      </div>
     </div>
   )
 }
