@@ -33,7 +33,7 @@ import { ellipsify } from '../ui/ui-layout'
 
 export function Header() {
   const { connection } = useConnection()
-  const { publicKey, signMessage } = useWallet()
+  const { publicKey } = useWallet()
   const [balance, setBalance] = useState<number | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const { cluster } = useCluster()
@@ -56,17 +56,6 @@ export function Header() {
     const interval = setInterval(getBalance, 30000)
     return () => clearInterval(interval)
   }, [publicKey, connection])
-
-  const handleSignMessage = async () => {
-    try {
-      if (!signMessage) throw new Error('Wallet does not support message signing')
-      const message = new TextEncoder().encode('Welcome to SolCrusher! Sign this message to verify your wallet.')
-      await signMessage(message)
-      setIsAuthenticated(true)
-    } catch (error) {
-      console.error('Error signing message:', error)
-    }
-  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] bg-[#1E1B2E]/80 backdrop-blur-sm border-b border-purple-500/20">
@@ -144,7 +133,7 @@ export function Header() {
             {!publicKey ? (
               <WalletButton />
             ) : !isAuthenticated ? (
-              <Button onClick={handleSignMessage} className="bg-[#14F195] hover:bg-[#14F195]/90 text-black">
+              <Button className="bg-[#14F195] hover:bg-[#14F195]/90 text-black">
                 Verify Wallet
               </Button>
             ) : null}
@@ -208,7 +197,7 @@ export function Header() {
                     {!publicKey ? (
                       <WalletButton />
                     ) : !isAuthenticated ? (
-                      <Button onClick={handleSignMessage} className="w-full bg-[#14F195] hover:bg-[#14F195]/90 text-black">
+                      <Button className="w-full bg-[#14F195] hover:bg-[#14F195]/90 text-black">
                         Verify Wallet
                       </Button>
                     ) : null}

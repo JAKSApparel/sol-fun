@@ -23,7 +23,9 @@
     },
     "baseUrl": ".",
     "types": ["node", "react", "react-dom"],
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true
   },
   "include": [
     "next-env.d.ts",

@@ -63,8 +63,16 @@ export default function CreateTokenPage() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!publicKey) return
+    if (!umi) {
+      toast.error('UMI provider not initialized')
+      return
+    }
     
+    if (!publicKey) {
+      toast.error('Please connect your wallet')
+      return
+    }
+
     setIsCreating(true)
     try {
       const mint = generateSigner(umi)
@@ -102,7 +110,7 @@ export default function CreateTokenPage() {
       toast.success('Token created successfully!')
       router.push(`/dashboard/tokens/${base58.serialize(mint.publicKey)}`)
     } catch (error) {
-      console.error('Failed to create token:', error)
+      console.error('Error creating token:', error)
       toast.error('Failed to create token')
     } finally {
       setIsCreating(false)

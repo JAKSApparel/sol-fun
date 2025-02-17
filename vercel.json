@@ -5,17 +5,12 @@
       "src": "package.json",
       "use": "@vercel/next",
       "config": {
-        "installCommand": "npm install --legacy-peer-deps",
-        "buildCommand": "npm run build"
+        "installCommand": "pnpm install",
+        "buildCommand": "pnpm build"
       }
     }
   ],
   "env": {
-    "HELIUS_PUBLIC_API_KEY": "09d18522-3a1e-4502-934f-563b190d6d11",
     "NEXT_PUBLIC_PROGRAM_ID": "3GAXYKxpno85CSNnDGvHLYYiqdRF2Cz11g1VEhqgpump"
-  },
-  "github": {
-    "enabled": true,
-    "silent": true
   }
 } 
