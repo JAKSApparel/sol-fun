@@ -4,7 +4,6 @@ import './globals.css'
 import {ClusterProvider} from '@/components/cluster/cluster-data-access'
 import {SolanaProvider} from '@/components/solana/solana-provider'
 import {UiLayout} from '@/components/ui/ui-layout'
-import {ReactQueryProvider} from './react-query-provider'
 import { SolanaConnectionGuard } from '@/components/solana/solana-connection'
 import '@/lib/polyfills'
 import { ThemeProvider } from "@/components/theme-provider"
@@ -38,18 +37,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           enableSystem
           disableTransitionOnChange
         >
-          <ReactQueryProvider>
-            <ClusterProvider>
-              <SolanaProvider>
-                <UmiProvider>
-                  <SolanaConnectionGuard>
-                    {children}
-                  </SolanaConnectionGuard>
-                  <Toaster position="bottom-right" />
-                </UmiProvider>
-              </SolanaProvider>
-            </ClusterProvider>
-          </ReactQueryProvider>
+          <ClusterProvider>
+            <SolanaProvider>
+              <UmiProvider>
+                <SolanaConnectionGuard>
+                  {children}
+                </SolanaConnectionGuard>
+                <Toaster position="bottom-right" />
+              </UmiProvider>
+            </SolanaProvider>
+          </ClusterProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type FormEvent, type ChangeEvent } from 'react'
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -61,7 +61,7 @@ export default function CreateTokenPage() {
   const router = useRouter()
   const umi = useUmi()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!publicKey) return
     
@@ -82,7 +82,8 @@ export default function CreateTokenPage() {
       builder.add(createMetadataAccountV3(umi, {
         metadata: metadataPda,
         mint: mint.publicKey,
-        authority: mint,
+        mintAuthority: authority.publicKey,
+        updateAuthority: authority.publicKey,
         data: {
           name: formData.name,
           symbol: formData.symbol,
@@ -108,7 +109,7 @@ export default function CreateTokenPage() {
     }
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setFormData(prev => ({ 
@@ -119,7 +120,7 @@ export default function CreateTokenPage() {
     }
   }
 
-  const handleSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSymbolChange = (e: ChangeEvent<HTMLInputElement>) => {
     let symbol = e.target.value.toUpperCase()
     symbol = symbol.replace(/CRUSH$/, '')
     setFormData(prev => ({ ...prev, symbol }))

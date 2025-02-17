@@ -1,14 +1,12 @@
 import type { Config } from "tailwindcss";
 
-const config = {
+const config: Config = {
     darkMode: ["class"],
     content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  prefix: "",
   theme: {
   	container: {
   		center: true,
@@ -99,7 +97,7 @@ const config = {
   		}
   	}
   },
-  plugins: [require('daisyui'), require("tailwindcss-animate")],
-} satisfies Config;
+  plugins: [require("tailwindcss-animate")],
+}
 
 export default config;

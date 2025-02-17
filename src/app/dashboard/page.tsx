@@ -14,6 +14,16 @@ import { PortfolioOverview } from "@/components/dashboard/portfolio-overview"
 import { PortfolioChart } from "@/components/dashboard/portfolio-chart"
 import { RecentActivity } from "@/components/dashboard/recent-activity"
 
+// Sample data - replace with your actual data source
+const sampleData = [
+  { date: '2024-01', value: 400 },
+  { date: '2024-02', value: 300 },
+  { date: '2024-03', value: 600 },
+  { date: '2024-04', value: 800 },
+  { date: '2024-05', value: 700 },
+  { date: '2024-06', value: 1000 }
+]
+
 export default function DashboardPage() {
   const { publicKey } = useWallet()
 
@@ -47,7 +57,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 p-6 bg-[#1E1B2E] border-purple-500/20">
           <h2 className="text-lg font-semibold mb-4">Portfolio Performance</h2>
-          <PortfolioChart />
+          <PortfolioChart data={sampleData} />
         </Card>
         
         <Card className="p-6 bg-[#1E1B2E] border-purple-500/20">

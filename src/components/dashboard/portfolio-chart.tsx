@@ -1,72 +1,35 @@
 'use client'
 
-import { Line } from 'react-chartjs-2'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js'
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts'
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-)
+type PortfolioDataPoint = {
+  date: string
+  value: number
+}
 
-export function PortfolioChart() {
-  const data = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Portfolio Value',
-        data: [0, 10, 5, 15, 10, 20],
-        borderColor: '#14F195',
-        backgroundColor: '#14F195',
-        tension: 0.4,
-      },
-    ],
-  }
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    scales: {
-      x: {
-        grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-        },
-        ticks: {
-          color: '#fff',
-        },
-      },
-      y: {
-        grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-        },
-        ticks: {
-          color: '#fff',
-        },
-      },
-    },
-    maintainAspectRatio: false,
-  }
-
+export function PortfolioChart({ data }: { data: PortfolioDataPoint[] }) {
   return (
-    <div className="h-[300px]">
-      <Line data={data} options={options} />
-    </div>
+    <ResponsiveContainer width="100%" height={400}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Line 
+          type="monotone" 
+          dataKey="value" 
+          stroke="#9945FF" 
+          strokeWidth={2}
+        />
+      </LineChart>
+    </ResponsiveContainer>
   )
 } 
