@@ -12,7 +12,7 @@ import {
   VersionedTransaction,
 } from '@solana/web3.js'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import {useToast} from "@/components/ui/use-toast"
 import {useTransactionToast} from '../ui/ui-layout'
 
 export function useGetBalance({ address }: { address: PublicKey }) {
@@ -57,6 +57,7 @@ export function useTransferSol({ address }: { address: PublicKey }) {
   const transactionToast = useTransactionToast()
   const wallet = useWallet()
   const client = useQueryClient()
+  const { toast } = useToast()
 
   return useMutation({
     mutationKey: ['transfer-sol', { endpoint: connection.rpcEndpoint, address }],
@@ -98,7 +99,11 @@ export function useTransferSol({ address }: { address: PublicKey }) {
       ])
     },
     onError: (error: unknown) => {
-      toast.error(`Transaction failed! ${error}`)
+      toast({
+        title: "Error",
+        description: `Transaction failed! ${error}`,
+        variant: "destructive"
+      })
     },
   })
 }
@@ -107,6 +112,7 @@ export function useRequestAirdrop({ address }: { address: PublicKey }) {
   const { connection } = useConnection()
   const transactionToast = useTransactionToast()
   const client = useQueryClient()
+  const { toast } = useToast()
 
   return useMutation({
     mutationKey: ['airdrop', { endpoint: connection.rpcEndpoint, address }],

@@ -4,13 +4,13 @@ import Link from 'next/link'
 import {usePathname} from 'next/navigation'
 import * as React from 'react'
 import {ReactNode, Suspense, useEffect, useRef} from 'react'
-import toast, {Toaster} from 'react-hot-toast'
+import { Toaster } from "@/components/ui/toaster"
 import {ExplorerLink} from '../cluster/cluster-ui'
 
 export function UiLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background font-sans antialiased">
-      <Toaster position="bottom-right" />
+      <Toaster />
       {children}
     </div>
   )

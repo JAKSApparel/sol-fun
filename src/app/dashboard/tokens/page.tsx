@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TokenListingService } from '@/lib/services/token-listing-service'
 import { TokenManagementService } from '@/lib/services/token-management-service'
-import { toast } from 'react-hot-toast'
+import { useToast } from "@/components/ui/use-toast"
 import Link from 'next/link'
 import { Input } from "@/components/ui/input"
 import { Search, Plus } from "lucide-react"
@@ -25,6 +25,7 @@ export default function TokensPage() {
   const { publicKey } = useWallet()
   const [tokens, setTokens] = useState<TokenInfo[]>([])
   const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
 
   useEffect(() => {
     if (!publicKey) return
@@ -38,7 +39,11 @@ export default function TokensPage() {
         setTokens(userTokens)
       } catch (error) {
         console.error('Failed to fetch tokens:', error)
-        toast.error('Failed to load tokens')
+        toast({
+          title: "Error",
+          description: "Failed to load tokens",
+          variant: "destructive"
+        })
       } finally {
         setLoading(false)
       }
