@@ -1,4 +1,5 @@
 {
+  "version": 2,
   "builds": [
     {
       "src": "package.json",
@@ -10,10 +11,11 @@
     }
   ],
   "env": {
-    "HELIUS_API_KEY": "@helius_api_key",
+    "HELIUS_API_KEY": "09d18522-3a1e-4502-934f-563b190d6d11",
     "NEXT_PUBLIC_PROGRAM_ID": "@program_id"
   },
   "github": {
+    "enabled": true,
     "silent": true
   }
 } 
