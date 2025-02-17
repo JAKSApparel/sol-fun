@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Zap, Shield, BarChart3, Copy, Construction, X } from 'lucide-react'
 import { Button } from '../ui/button'
 import { TradingInterface } from '../trading/trading-interface'
-import { toast } from 'react-hot-toast'
+import { useToast } from "@/components/ui/use-toast"
 import Link from 'next/link'
 
 // Add this component for the blurred token address
@@ -175,6 +175,23 @@ function DevelopmentNotice() {
 }
 
 export default function HomeFeature() {
+  const { toast } = useToast()
+  
+  const handleSuccess = () => {
+    toast({
+      title: "Success",
+      description: "Your message here",
+    })
+  }
+  
+  const handleError = () => {
+    toast({
+      title: "Error",
+      description: "Error message here",
+      variant: "destructive",
+    })
+  }
+
   return (
     <div className="min-h-screen bg-[#13111C]">
       {/* Hero Section */}

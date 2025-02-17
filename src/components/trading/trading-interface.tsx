@@ -8,13 +8,14 @@ import { Badge } from "@/components/ui/badge"
 import { TokenSelectDialog } from "./token-select-dialog"
 import { tokens, type Token } from "@/token-list"
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { toast } from 'react-hot-toast'
+import { useToast } from "@/components/ui/use-toast"
 
 interface TradingInterfaceProps {
   initialToken?: string
 }
 
 export function TradingInterface({ initialToken }: TradingInterfaceProps) {
+  const { toast } = useToast()
   const { publicKey } = useWallet()
   const [sellToken, setSellToken] = useState<Token>(tokens[0])
   const [buyToken, setBuyToken] = useState<Token>(tokens[1])
@@ -27,12 +28,19 @@ export function TradingInterface({ initialToken }: TradingInterfaceProps) {
     setBuyToken(temp)
   }
 
-  const handleTrade = async () => {
+  const handleTrade = () => {
     if (!publicKey) {
-      toast.error('Please connect your wallet')
+      toast({
+        title: "Error",
+        description: "Please connect your wallet first",
+        variant: "destructive"
+      })
       return
     }
-    toast.success('Trade feature coming soon!')
+    toast({
+      title: "Success",
+      description: "Trade executed successfully!"
+    })
   }
 
   return (

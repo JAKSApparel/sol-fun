@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { TradingInterface } from '@/components/trading/trading-interface'
 import { Copy, Zap, Bot, Shield, BarChart2 } from 'lucide-react'
 import Link from 'next/link'
-import { toast } from 'react-hot-toast'
+import { useToast } from "@/components/ui/use-toast"
 
 const CONTRACT_ADDRESS = "3GAXYKxpno85CSNnDGvHLYYiqdRF2Cz11g1VEhqgpump"
 
@@ -15,9 +15,14 @@ const SOCIAL_LINKS = {
 }
 
 export default function HomePage() {
-  const copyAddress = () => {
+  const { toast } = useToast()
+
+  const handleCopy = () => {
     navigator.clipboard.writeText(CONTRACT_ADDRESS)
-    toast.success('Contract address copied!')
+    toast({
+      title: "Copied!",
+      description: "Contract address copied to clipboard",
+    })
   }
 
   return (
@@ -59,7 +64,7 @@ export default function HomePage() {
                   size="lg" 
                   variant="outline"
                   className="border-purple-500/20 text-white"
-                  onClick={copyAddress}
+                  onClick={handleCopy}
                 >
                   <Copy className="mr-2 h-4 w-4" />
                   {CONTRACT_ADDRESS}

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Upload } from 'lucide-react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { toast } from 'react-hot-toast'
+import { useToast } from "@/components/ui/use-toast"
 
 type FormDataType = {
   name: string
@@ -20,6 +20,7 @@ type FormDataType = {
 }
 
 export default function CreateNFTPage() {
+  const { toast } = useToast()
   const { publicKey } = useWallet()
   const [isUploading, setIsUploading] = useState(false)
   const [formData, setFormData] = useState<FormDataType>({
@@ -33,24 +34,39 @@ export default function CreateNFTPage() {
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({ ...prev, image: e.target.files![0] }))
+      const file = e.target.files[0]
+      setFormData(prev => ({
+        ...prev,
+        image: file
+      }))
     }
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!publicKey) {
-      toast.error('Please connect your wallet first')
+      toast({
+        title: "Error",
+        description: "Please connect your wallet first",
+        variant: "destructive",
+      })
       return
     }
     
     try {
       setIsUploading(true)
       // NFT creation logic here
-      toast.success('NFT Collection created successfully!')
+      toast({
+        title: "Success",
+        description: "NFT Collection created successfully!",
+      })
     } catch (error) {
       console.error('Error creating NFT:', error)
-      toast.error('Failed to create NFT collection')
+      toast({
+        title: "Error",
+        description: "Failed to create NFT collection",
+        variant: "destructive",
+      })
     } finally {
       setIsUploading(false)
     }

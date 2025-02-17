@@ -7,7 +7,7 @@ import {UiLayout} from '@/components/ui/ui-layout'
 import { SolanaConnectionGuard } from '@/components/solana/solana-connection'
 import '@/lib/polyfills'
 import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from 'react-hot-toast'
+import { Toaster } from "@/components/ui/toaster"
 import { UmiProvider } from '@/components/umi/umi-provider'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <SolanaConnectionGuard>
                   {children}
                 </SolanaConnectionGuard>
-                <Toaster position="bottom-right" />
+                <Toaster />
               </UmiProvider>
             </SolanaProvider>
           </ClusterProvider>
