@@ -3,7 +3,12 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
 import { type Cluster, clusterApiUrl } from '@solana/web3.js'
 
-export type ClusterNetwork = Cluster | 'localnet'
+export enum ClusterNetwork {
+  Mainnet = 'mainnet-beta',
+  Devnet = 'devnet',
+  Testnet = 'testnet',
+  Localnet = 'localnet'
+}
 
 export interface ClusterInfo {
   name: string
@@ -15,22 +20,22 @@ const CLUSTERS: ClusterInfo[] = [
   {
     name: 'Devnet',
     endpoint: clusterApiUrl('devnet'),
-    network: 'devnet',
+    network: ClusterNetwork.Devnet,
   },
   {
     name: 'Testnet',
     endpoint: clusterApiUrl('testnet'),
-    network: 'testnet',
+    network: ClusterNetwork.Testnet,
   },
   {
     name: 'Mainnet Beta',
     endpoint: clusterApiUrl('mainnet-beta'),
-    network: 'mainnet-beta',
+    network: ClusterNetwork.Mainnet,
   },
   {
     name: 'Localnet',
     endpoint: 'http://localhost:8899',
-    network: 'localnet',
+    network: ClusterNetwork.Localnet,
   },
 ]
 

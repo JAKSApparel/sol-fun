@@ -28,6 +28,7 @@ import {
 import { base58 } from '@metaplex-foundation/umi/serializers'
 import { useRouter } from 'next/navigation'
 import { useUmi } from '@/components/umi/umi-provider'
+import Image from 'next/image'
 
 type TokenMetadata = {
   name: string
@@ -81,7 +82,8 @@ export default function CreateTokenPage() {
       builder.add(createMetadataAccountV3(umi, {
         metadata: metadataPda,
         mint: mint.publicKey,
-        authority: mint,
+        mintAuthority: authority.publicKey,
+        updateAuthority: authority.publicKey,
         data: {
           name: formData.name,
           symbol: formData.symbol,
@@ -223,10 +225,12 @@ export default function CreateTokenPage() {
               >
                 {formData.imagePreview ? (
                   <div className="relative w-32 h-32 mb-2">
-                    <img
+                    <Image
                       src={formData.imagePreview}
                       alt="Token logo preview"
-                      className="w-full h-full object-cover rounded-lg"
+                      width={128}
+                      height={128}
+                      className="object-cover rounded-lg"
                     />
                     <Button
                       type="button"
