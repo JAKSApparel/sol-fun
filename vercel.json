@@ -10,7 +10,7 @@
     }
   ],
   "env": {
-    "NEXT_PUBLIC_HELIUS_API_KEY": "@helius_api_key",
+    "HELIUS_API_KEY": "@helius_api_key",
     "NEXT_PUBLIC_PROGRAM_ID": "@program_id"
   },
   "github": {

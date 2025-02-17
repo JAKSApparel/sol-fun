@@ -23,6 +23,7 @@ import {
   percentAmount,
   publicKey as toPublicKey,
   Signer,
+  createSignerFromKeypair,
 } from '@metaplex-foundation/umi'
 import { base58 } from '@metaplex-foundation/umi/serializers'
 import { useRouter } from 'next/navigation'
@@ -80,8 +81,7 @@ export default function CreateTokenPage() {
       builder.add(createMetadataAccountV3(umi, {
         metadata: metadataPda,
         mint: mint.publicKey,
-        mintAuthority: authority.publicKey,
-        updateAuthority: authority.publicKey,
+        authority: mint.publicKey,
         data: {
           name: formData.name,
           symbol: formData.symbol,
