@@ -13,7 +13,11 @@ import { useUmi } from '@/components/umi/umi-provider'
 import { transferTokens } from '@metaplex-foundation/mpl-toolbox'
 import { publicKey } from '@metaplex-foundation/umi'
 
-export function TradingInterface() {
+interface TradingInterfaceProps {
+  initialToken?: string
+}
+
+export function TradingInterface({ initialToken }: TradingInterfaceProps) {
   const umi = useUmi()
   const { publicKey: walletKey } = useWallet()
   const [sellToken, setSellToken] = useState<Token>(tokens[0])

@@ -1,7 +1,7 @@
 'use client'
 
 import { useConnection } from '@solana/wallet-adapter-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import { useCluster } from '../cluster/cluster-data-access'
@@ -11,18 +11,18 @@ export function SolanaConnectionGuard({ children }: { children: React.ReactNode 
   const { cluster } = useCluster()
   const [isConnected, setIsConnected] = useState(true)
 
-  useEffect(() => {
-    checkConnection()
-  }, [connection, cluster])
-
-  const checkConnection = async () => {
+  const checkConnection = useCallback(() => {
     try {
       await connection.getVersion()
       setIsConnected(true)
     } catch (error) {
       setIsConnected(false)
     }
-  }
+  }, [connection])
+
+  useEffect(() => {
+    checkConnection()
+  }, [checkConnection])
 
   if (!isConnected) {
     return (
