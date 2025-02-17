@@ -7,7 +7,7 @@
       "anchor-build": "cd anchor && anchor build",
       "anchor-localnet": "cd anchor && anchor localnet",
       "anchor-test": "cd anchor && anchor test",
-      "dev": "next dev",
+      "dev": "NODE_OPTIONS='--max_old_space_size=4096' next dev",
       "build": "next build",
       "start": "next start",
       "lint": "next lint"
@@ -62,5 +62,5 @@
     "engines": {
       "node": "18.x"
     },
-    "packageManager": "npm@9.x"
+    "packageManager": "pnpm@8.x"
   }

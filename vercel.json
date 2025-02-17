@@ -5,7 +5,7 @@
       "src": "package.json",
       "use": "@vercel/next",
       "config": {
-        "installCommand": "pnpm install --no-frozen-lockfile --registry=https://registry.npmjs.org/",
+        "installCommand": "pnpm install --no-frozen-lockfile",
         "nodeVersion": "18.x"
       }
     }
@@ -15,7 +15,7 @@
   },
   "build": {
     "env": {
-      "NPM_FLAGS": "--no-frozen-lockfile --registry=https://registry.npmjs.org/"
+      "ENABLE_EXPERIMENTAL_COREPACK": "1"
     }
   }
 } 
