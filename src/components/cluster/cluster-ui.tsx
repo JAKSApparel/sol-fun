@@ -1,7 +1,11 @@
 'use client'
 
 import { useConnection } from '@solana/wallet-adapter-react'
-import { IconTrash } from '@tabler/icons-react'
+import { 
+  Settings, 
+  ChevronDown,
+  // ... other icons you need
+} from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { ReactNode, useState } from 'react'
 import { AppModal } from '../ui/ui-layout'
@@ -164,7 +168,7 @@ export function ClusterUiTable() {
                     deleteCluster(item)
                   }}
                 >
-                  <IconTrash size={16} />
+                  <Settings size={16} />
                 </button>
               </td>
             </tr>

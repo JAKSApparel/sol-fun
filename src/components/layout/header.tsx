@@ -1,7 +1,8 @@
 'use client'
 
 import React from 'react'
-import { useWallet, useConnection } from '@solana/wallet-adapter-react'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useConnection } from '@solana/wallet-adapter-react'
 import { WalletButton } from '../solana/solana-provider'
 import { Button } from '../ui/button'
 import { NetworkSelector } from '../solana/network-selector'
