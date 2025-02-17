@@ -11,29 +11,20 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { toast } from 'react-hot-toast'
 import {
   createMetadataAccountV3,
-  PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
   findMetadataPda,
 } from '@metaplex-foundation/mpl-token-metadata'
 import {
   createMint,
   createMintWithAssociatedToken,
   findAssociatedTokenPda,
-  TokenWithMint,
-  mplToolbox,
 } from '@metaplex-foundation/mpl-toolbox'
 import {
   generateSigner,
   percentAmount,
   publicKey as toPublicKey,
   Signer,
-  some,
 } from '@metaplex-foundation/umi'
-import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
-import { bundlrUploader } from '@metaplex-foundation/umi-uploader-bundlr'
 import { base58 } from '@metaplex-foundation/umi/serializers'
-import { useCluster } from '@/components/cluster/cluster-data-access'
-import { Keypair } from '@solana/web3.js'
-import { createSignerFromWalletAdapter } from '@metaplex-foundation/umi-signer-wallet-adapters'
 import { useRouter } from 'next/navigation'
 import { useUmi } from '@/components/umi/umi-provider'
 
@@ -43,24 +34,66 @@ type TokenMetadata = {
 }
 
 export default function CreateTokenPage() {
-  const umi = useUmi()
-  const { publicKey } = useWallet()
-  const router = useRouter()
-  const { cluster } = useCluster()
-  const [isCreating, setIsCreating] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     symbol: '',
     description: '',
-    image: null as File | null,
     supply: '',
     decimals: '9',
-    isBurnable: true,
-    isFrozen: false,
-    maxSupply: '',
     metadata: [] as TokenMetadata[],
-    imagePreview: '',
   })
+  const [isCreating, setIsCreating] = useState(false)
+  const [metadataUri, setMetadataUri] = useState('')
+  const { publicKey } = useWallet()
+  const router = useRouter()
+  const umi = useUmi()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!publicKey) return
+    
+    setIsCreating(true)
+    try {
+      const mint = generateSigner(umi)
+
+      const builder = createMintWithAssociatedToken(umi, {
+        mint,
+        owner: toPublicKey(publicKey.toBase58()),
+        decimals: Number(formData.decimals),
+        amount: BigInt(formData.supply),
+      })
+
+      const metadataPda = findMetadataPda(umi, { mint: mint.publicKey })
+
+      builder.add(createMetadataAccountV3(umi, {
+        metadata: metadataPda,
+        mint: mint.publicKey,
+        mintAuthority: toPublicKey(publicKey.toBase58()),
+        updateAuthority: toPublicKey(publicKey.toBase58()),
+        data: {
+          name: formData.name,
+          symbol: formData.symbol,
+          uri: 'https://arweave.net/your-metadata-uri', // Replace with actual metadata URI
+          sellerFeeBasisPoints: 0,
+          creators: null,
+          collection: null,
+          uses: null,
+        },
+        isMutable: true,
+        collectionDetails: null,
+      }))
+
+      const { signature } = await builder.sendAndConfirm(umi)
+      
+      toast.success('Token created successfully!')
+      router.push(`/dashboard/tokens/${base58.serialize(mint.publicKey)}`)
+    } catch (error) {
+      console.error('Failed to create token:', error)
+      toast.error('Failed to create token')
+    } finally {
+      setIsCreating(false)
+    }
+  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -105,52 +138,6 @@ export default function CreateTokenPage() {
       ...prev,
       metadata: prev.metadata.filter((_, i) => i !== index)
     }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!publicKey) return
-    
-    setIsCreating(true)
-    try {
-      const mint = generateSigner(umi)
-
-      const builder = createMintWithAssociatedToken(umi, {
-        mint,
-        owner: toPublicKey(publicKey.toBase58()),
-        decimals: Number(formData.decimals),
-        amount: BigInt(formData.supply),
-      })
-
-      const metadataPda = findMetadataPda(umi, { mint: mint.publicKey })
-
-      builder.add(createMetadataAccountV3(umi, {
-        metadata: metadataPda,
-        mint: mint.publicKey,
-        authority: toPublicKey(publicKey.toBase58()),
-        data: {
-          name: formData.name,
-          symbol: getFullSymbol(),
-          uri: metadataUri,
-          sellerFeeBasisPoints: 0,
-          creators: null,
-          collection: null,
-          uses: null,
-        },
-        isMutable: true,
-        collectionDetails: null,
-      }))
-
-      const { signature } = await builder.sendAndConfirm(umi)
-      
-      toast.success('Token created successfully!')
-      router.push(`/dashboard/tokens/${base58.serialize(mint.publicKey)}`)
-    } catch (error) {
-      console.error('Failed to create token:', error)
-      toast.error('Failed to create token')
-    } finally {
-      setIsCreating(false)
-    }
   }
 
   return (
@@ -272,40 +259,6 @@ export default function CreateTokenPage() {
                 max="9"
               />
             </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="burnable"
-                checked={formData.isBurnable}
-                onChange={e => setFormData(prev => ({ ...prev, isBurnable: e.target.checked }))}
-                className="rounded border-gray-400"
-              />
-              <Label htmlFor="burnable">Token can be burned</Label>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="frozen"
-                checked={formData.isFrozen}
-                onChange={e => setFormData(prev => ({ ...prev, isFrozen: e.target.checked }))}
-                className="rounded border-gray-400"
-              />
-              <Label htmlFor="frozen">Enable freeze authority</Label>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Max Supply (Optional)</Label>
-            <Input
-              type="number"
-              placeholder="Leave empty for unlimited supply"
-              value={formData.maxSupply}
-              onChange={e => setFormData(prev => ({ ...prev, maxSupply: e.target.value }))}
-            />
           </div>
 
           <div className="space-y-4">
