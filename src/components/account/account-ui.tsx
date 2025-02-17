@@ -2,7 +2,7 @@
 
 import { useWallet } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
-import { IconRefresh } from '@tabler/icons-react'
+import { RefreshCw } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { AppModal, ellipsify } from '../ui/ui-layout'
@@ -122,7 +122,7 @@ export function AccountTokens({ address }: { address: PublicKey }) {
                   })
                 }}
               >
-                <IconRefresh size={16} />
+                <RefreshCw size={16} />
               </button>
             )}
           </div>
@@ -204,7 +204,7 @@ export function AccountTransactions({ address }: { address: PublicKey }) {
             <span className="loading loading-spinner"></span>
           ) : (
             <button className="btn btn-sm btn-outline" onClick={() => query.refetch()}>
-              <IconRefresh size={16} />
+              <RefreshCw size={16} />
             </button>
           )}
         </div>
