@@ -4,12 +4,12 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletButton } from '../solana/solana-provider'
 import { AppHero, ellipsify } from '../ui/ui-layout'
 import { ExplorerLink } from '../cluster/cluster-ui'
-import { useSolcrusherfunProgram } from './solcrusherfun-data-access'
+import { useSolCrusherFun } from './solcrusherfun-data-access'
 import { SolcrusherfunCreate, SolcrusherfunList } from './solcrusherfun-ui'
 
 export default function SolcrusherfunFeature() {
   const { publicKey } = useWallet()
-  const { programId } = useSolcrusherfunProgram()
+  const { program } = useSolCrusherFun()
 
   return publicKey ? (
     <div>
@@ -20,7 +20,7 @@ export default function SolcrusherfunFeature() {
         }
       >
         <p className="mb-6">
-          <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
+          <ExplorerLink path={`account/${program.programId}`} label={ellipsify(program.programId.toString())} />
         </p>
         <SolcrusherfunCreate />
       </AppHero>
