@@ -5,12 +5,17 @@
       "src": "package.json",
       "use": "@vercel/next",
       "config": {
-        "installCommand": "pnpm install --no-frozen-lockfile",
-        "buildCommand": "pnpm build"
+        "installCommand": "pnpm install --no-frozen-lockfile --registry=https://registry.npmjs.org/",
+        "nodeVersion": "18.x"
       }
     }
   ],
   "env": {
     "NEXT_PUBLIC_PROGRAM_ID": "3GAXYKxpno85CSNnDGvHLYYiqdRF2Cz11g1VEhqgpump"
+  },
+  "build": {
+    "env": {
+      "NPM_FLAGS": "--no-frozen-lockfile --registry=https://registry.npmjs.org/"
+    }
   }
 } 
