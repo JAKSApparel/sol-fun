@@ -16,9 +16,29 @@ export function TokenList() {
     enabled: !!publicKey,
   })
 
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error loading tokens</div>
-  if (!tokens) return <div>No tokens found</div>
+  if (isLoading) {
+    return (
+      <div className="flex justify-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center p-4 text-red-500">
+        Failed to load tokens. Please try again.
+      </div>
+    )
+  }
+
+  if (!tokens?.length) {
+    return (
+      <div className="text-center p-4 text-gray-500">
+        No tokens found.
+      </div>
+    )
+  }
 
   return (
     <div>

@@ -1,15 +1,15 @@
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
-import toast from 'react-hot-toast'
+import { toast } from "@/components/ui/use-toast"
 
 export async function requestDevnetAirdrop(connection: Connection, address: PublicKey) {
   try {
     const signature = await connection.requestAirdrop(address, LAMPORTS_PER_SOL)
     await connection.confirmTransaction(signature)
-    toast.success('Airdrop successful!')
+    toast({ title: "Success", description: "Airdrop successful!" })
     return signature
   } catch (error) {
     console.error('Airdrop failed:', error)
-    toast.error('Airdrop failed. Please try again.')
+    toast({ title: "Error", description: "Airdrop failed. Please try again.", variant: "destructive" })
     throw error
   }
 }

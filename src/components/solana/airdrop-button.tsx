@@ -4,7 +4,7 @@ import React from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { Button } from '../ui/button'
 import { Loader2 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from "@/components/ui/use-toast"
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { cn } from '@/lib/utils'
 
@@ -17,7 +17,7 @@ export function AirdropButton({ className, ...props }: AirdropButtonProps) {
 
   const handleAirdrop = async () => {
     if (!publicKey) {
-      toast.error('Please connect your wallet first')
+      toast({ title: "Error", description: "Please connect your wallet first", variant: "destructive" })
       return
     }
 
@@ -33,14 +33,14 @@ export function AirdropButton({ className, ...props }: AirdropButtonProps) {
         signature: signature
       }, 'confirmed')
 
-      toast.success('Airdrop successful! 1 SOL received')
+      toast({ title: "Success", description: "Airdrop successful! 1 SOL received" })
       
       // Get updated balance
       const balance = await connection.getBalance(publicKey)
       console.log('New balance:', balance / LAMPORTS_PER_SOL)
     } catch (error) {
       console.error('Airdrop failed:', error)
-      toast.error('Airdrop failed. Please try again in a moment.')
+      toast({ title: "Error", description: "Airdrop failed. Please try again in a moment.", variant: "destructive" })
     } finally {
       setIsLoading(false)
     }

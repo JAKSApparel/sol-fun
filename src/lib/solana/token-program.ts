@@ -14,7 +14,7 @@ import {
   getAssociatedTokenAddress,
   createTransferInstruction
 } from '@solana/spl-token'
-import { toast } from 'react-hot-toast'
+import { toast } from "@/components/ui/use-toast"
 
 export async function getOrCreateAssociatedTokenAccount(
   connection: Connection,

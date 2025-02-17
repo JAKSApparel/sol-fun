@@ -9,6 +9,7 @@ import '@/lib/polyfills'
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { UmiProvider } from '@/components/umi/umi-provider'
+import { ErrorBoundary } from '@/components/error-boundary'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,23 +32,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ClusterProvider>
-            <SolanaProvider>
-              <UmiProvider>
-                <SolanaConnectionGuard>
-                  {children}
-                </SolanaConnectionGuard>
-                <Toaster />
-              </UmiProvider>
-            </SolanaProvider>
-          </ClusterProvider>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+          >
+            <ClusterProvider>
+              <SolanaProvider>
+                <UmiProvider>
+                  <SolanaConnectionGuard>
+                    <UiLayout>{children}</UiLayout>
+                  </SolanaConnectionGuard>
+                </UmiProvider>
+              </SolanaProvider>
+            </ClusterProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
+        <Toaster />
       </body>
     </html>
   )
