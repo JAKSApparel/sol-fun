@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,25 +10,34 @@ import { Upload } from 'lucide-react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { toast } from 'react-hot-toast'
 
+type FormDataType = {
+  name: string
+  symbol: string
+  description: string
+  image: File | null
+  supply: string
+  royalty: string
+}
+
 export default function CreateNFTPage() {
   const { publicKey } = useWallet()
   const [isUploading, setIsUploading] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataType>({
     name: '',
     symbol: '',
     description: '',
-    image: null as File | null,
+    image: null,
     supply: '',
     royalty: ''
   })
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFormData(prev => ({ ...prev, image: e.target.files![0] }))
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!publicKey) {
       toast.error('Please connect your wallet first')
@@ -49,26 +58,26 @@ export default function CreateNFTPage() {
 
   return (
     <div className="container max-w-2xl mx-auto py-6">
-      <Card className="p-6 bg-[#1E1B2E] border-purple-500/20">
-        <h1 className="text-2xl font-bold mb-6">Create NFT Collection</h1>
-        
+      <Card className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label>Collection Name</Label>
             <Input
               placeholder="Enter collection name"
               value={formData.name}
-              onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                setFormData(prev => ({ ...prev, name: e.target.value }))}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Symbol</Label>
+            <Label>Collection Symbol</Label>
             <Input
               placeholder="Enter collection symbol"
               value={formData.symbol}
-              onChange={e => setFormData(prev => ({ ...prev, symbol: e.target.value }))}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                setFormData(prev => ({ ...prev, symbol: e.target.value }))}
               required
             />
           </div>
@@ -78,27 +87,24 @@ export default function CreateNFTPage() {
             <Textarea
               placeholder="Enter collection description"
               value={formData.description}
-              onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => 
+                setFormData(prev => ({ ...prev, description: e.target.value }))}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Upload Image</Label>
-            <div className="border-2 border-dashed border-purple-500/20 rounded-lg p-4">
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-                id="image-upload"
-                required
-              />
-              <label
-                htmlFor="image-upload"
-                className="flex flex-col items-center justify-center cursor-pointer"
-              >
-                <Upload className="w-8 h-8 text-purple-500 mb-2" />
+            <Label>Collection Image</Label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+              <label className="flex flex-col items-center cursor-pointer">
+                <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  required
+                />
                 <span className="text-sm text-gray-400">
                   {formData.image ? formData.image.name : 'Click to upload collection image'}
                 </span>
@@ -113,7 +119,8 @@ export default function CreateNFTPage() {
                 type="number"
                 placeholder="Enter total supply"
                 value={formData.supply}
-                onChange={e => setFormData(prev => ({ ...prev, supply: e.target.value }))}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                  setFormData(prev => ({ ...prev, supply: e.target.value }))}
                 required
               />
             </div>
@@ -124,7 +131,8 @@ export default function CreateNFTPage() {
                 type="number"
                 placeholder="Enter royalty percentage"
                 value={formData.royalty}
-                onChange={e => setFormData(prev => ({ ...prev, royalty: e.target.value }))}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                  setFormData(prev => ({ ...prev, royalty: e.target.value }))}
                 required
               />
             </div>
