@@ -82,8 +82,7 @@ export default function CreateTokenPage() {
       builder.add(createMetadataAccountV3(umi, {
         metadata: metadataPda,
         mint: mint.publicKey,
-        mintAuthority: authority.publicKey,
-        updateAuthority: authority.publicKey,
+        authority: mint,
         data: {
           name: formData.name,
           symbol: formData.symbol,

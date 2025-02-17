@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { TokenListingService } from '@/lib/services/token-listing-service'
+import { TokenListingService } from '@/lib/token-listing-service'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { TradingInterface } from '@/components/trading/trading-interface'
@@ -15,15 +15,18 @@ export default function TokenTradePage() {
   const [tokenInfo, setTokenInfo] = useState<any>(null)
 
   useEffect(() => {
-    const fetchTokenInfo = async () => {
-      if (!params.mint) return
-      const listingService = new TokenListingService(connection)
-      const info = await listingService.getTokenInfo(params.mint as string)
-      setTokenInfo(info)
-    }
-
     fetchTokenInfo()
-  }, [params.mint, connection])
+  }, [params.mint])
+
+  const fetchTokenInfo = async () => {
+    if (!params.mint) return
+    const listingService = new TokenListingService(
+      connection,
+      process.env.NEXT_PUBLIC_PROGRAM_ID as string
+    )
+    const info = await listingService.getTokenInfo(params.mint as string)
+    setTokenInfo(info)
+  }
 
   return (
     <div className="container mx-auto p-4">
